@@ -3,18 +3,21 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-
-  <title>Wallet Racers | Solana Racing</title>
+  <meta name="theme-color" content="#050805">
+  <title>Wallet Racers</title>
 
   <style>
     :root {
-      --green: #adff00;
-      --yellow: #fff500;
-      --black: #050705;
-      --panel: #101510;
-      --border: #33451f;
+      --bg: #030503;
+      --panel: rgba(10, 16, 9, 0.96);
+      --panel-2: rgba(18, 28, 14, 0.95);
+      --green: #a8ff00;
+      --yellow: #f5ff00;
+      --cyan: #2cf4e8;
+      --red: #ff3048;
       --text: #ffffff;
-      --muted: #9da79d;
+      --muted: #9aa596;
+      --border: rgba(168, 255, 0, 0.24);
     }
 
     * {
@@ -23,369 +26,752 @@
       padding: 0;
     }
 
+    html {
+      scroll-behavior: smooth;
+    }
+
     body {
       min-height: 100vh;
       overflow-x: hidden;
       color: var(--text);
       background:
-        radial-gradient(circle at top, #173200 0%, #050705 38%, #000 100%);
+        radial-gradient(
+          circle at 50% -10%,
+          rgba(168, 255, 0, 0.18),
+          transparent 35%
+        ),
+        linear-gradient(
+          180deg,
+          #050805 0%,
+          #010201 100%
+        );
       font-family: Arial, Helvetica, sans-serif;
     }
 
+    body::before {
+      content: "";
+      position: fixed;
+      inset: 0;
+      z-index: -2;
+      pointer-events: none;
+      opacity: 0.16;
+      background-image:
+        linear-gradient(
+          rgba(168, 255, 0, 0.08) 1px,
+          transparent 1px
+        ),
+        linear-gradient(
+          90deg,
+          rgba(168, 255, 0, 0.08) 1px,
+          transparent 1px
+        );
+      background-size: 46px 46px;
+    }
+
     button,
-    input,
     textarea {
       font: inherit;
     }
 
     .hero {
       position: relative;
-      width: 100%;
-      min-height: 320px;
-      display: flex;
-      align-items: flex-end;
-      justify-content: center;
+      min-height: 410px;
       overflow: hidden;
-      border-bottom: 2px solid var(--green);
+      border-bottom: 1px solid rgba(168, 255, 0, 0.5);
       background:
-        linear-gradient(to bottom, transparent 45%, rgba(0, 0, 0, 0.9)),
-        url("banner.png") center/cover no-repeat;
+        linear-gradient(
+          180deg,
+          rgba(0, 0, 0, 0.1),
+          rgba(0, 0, 0, 0.96)
+        ),
+        url("banner.png") center 36% / cover no-repeat;
     }
 
-    .hero::after {
+    .hero::before {
       content: "";
       position: absolute;
       inset: 0;
       pointer-events: none;
-      background: linear-gradient(
-        90deg,
-        rgba(0, 0, 0, 0.65),
-        transparent 45%,
-        rgba(0, 0, 0, 0.25)
-      );
+      background:
+        linear-gradient(
+          90deg,
+          rgba(0, 0, 0, 0.88),
+          transparent 48%,
+          rgba(0, 0, 0, 0.32)
+        );
     }
 
-    .navbar {
-      position: absolute;
-      z-index: 4;
-      top: 0;
-      left: 0;
-      width: 100%;
-      padding: 18px 5%;
+    .nav {
+      position: relative;
+      z-index: 3;
+      width: min(1380px, 94%);
+      margin: 0 auto;
+      padding: 20px 0;
       display: flex;
       justify-content: space-between;
       align-items: center;
-      background: linear-gradient(to bottom, rgba(0, 0, 0, 0.9), transparent);
+      gap: 16px;
     }
 
     .brand {
       display: flex;
       align-items: center;
       gap: 12px;
-      font-size: 24px;
-      font-weight: 900;
+      font-size: 22px;
+      font-weight: 1000;
       letter-spacing: 1px;
-      color: white;
       text-transform: uppercase;
     }
 
-    .brand-logo {
-      width: 54px;
-      height: 54px;
+    .brand img {
+      width: 56px;
+      height: 56px;
+      border: 2px solid var(--green);
       border-radius: 50%;
       object-fit: cover;
-      border: 2px solid var(--green);
-      box-shadow: 0 0 20px rgba(173, 255, 0, 0.55);
+      background: #000;
+      box-shadow:
+        0 0 0 6px rgba(168, 255, 0, 0.07),
+        0 0 25px rgba(168, 255, 0, 0.38);
     }
 
-    .nav-badge {
-      border: 1px solid var(--green);
+    .nav-actions {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: flex-end;
+      gap: 9px;
+    }
+
+    .nav-button {
+      min-width: 76px;
+      padding: 11px 14px;
+      border: 1px solid rgba(168, 255, 0, 0.45);
       border-radius: 999px;
-      padding: 10px 18px;
+      cursor: pointer;
       color: var(--green);
-      font-weight: 800;
-      background: rgba(0, 0, 0, 0.7);
+      background: rgba(0, 0, 0, 0.72);
+      font-size: 11px;
+      font-weight: 1000;
+      letter-spacing: 0.7px;
+      text-transform: uppercase;
+      transition: 0.2s ease;
+    }
+
+    .nav-button:hover {
+      color: #061000;
+      background: var(--green);
+      transform: translateY(-2px);
+    }
+
+    .nav-button.buy {
+      color: #061000;
+      border-color: var(--yellow);
+      background:
+        linear-gradient(
+          135deg,
+          var(--yellow),
+          var(--green)
+        );
+      box-shadow:
+        0 0 20px rgba(168, 255, 0, 0.24);
     }
 
     .hero-content {
       position: relative;
-      z-index: 3;
-      width: 100%;
-      padding: 130px 6% 42px;
-      text-align: center;
+      z-index: 2;
+      width: min(1380px, 94%);
+      margin: 0 auto;
+      padding: 62px 0 66px;
     }
 
-    .hero-content h1 {
-      font-size: clamp(42px, 8vw, 92px);
+    .eyebrow {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      margin-bottom: 14px;
+      color: var(--green);
+      font-size: 12px;
+      font-weight: 1000;
+      letter-spacing: 2px;
+      text-transform: uppercase;
+    }
+
+    .eyebrow::before {
+      content: "";
+      width: 36px;
+      height: 2px;
+      background: var(--green);
+      box-shadow: 0 0 12px var(--green);
+    }
+
+    .hero h1 {
+      max-width: 900px;
+      font-size: clamp(54px, 8vw, 108px);
       font-weight: 1000;
       font-style: italic;
-      line-height: 0.9;
+      line-height: 0.84;
+      letter-spacing: -5px;
       text-transform: uppercase;
       text-shadow:
-        0 4px 0 #3d5500,
-        0 0 28px rgba(173, 255, 0, 0.55);
+        0 4px 0 #355000,
+        0 0 28px rgba(168, 255, 0, 0.22);
     }
 
-    .hero-content h1 span {
+    .hero h1 span {
       color: var(--yellow);
     }
 
-    .hero-content p {
-      margin-top: 18px;
-      color: #e3e9df;
-      font-size: clamp(16px, 2vw, 22px);
+    .hero p {
+      max-width: 720px;
+      margin-top: 22px;
+      color: #dbe4d7;
+      font-size: clamp(17px, 2vw, 22px);
       font-weight: 700;
+      line-height: 1.5;
     }
 
-    .container {
-      width: min(1200px, 94%);
-      margin: 35px auto 70px;
+    .main {
+      position: relative;
+      z-index: 5;
+      width: min(1380px, 94%);
+      margin: -28px auto 80px;
     }
 
-    .dashboard {
+    .stats {
       display: grid;
-      grid-template-columns: 340px 1fr;
-      gap: 24px;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 14px;
+      margin-bottom: 18px;
+    }
+
+    .stat {
+      padding: 17px 18px;
+      border: 1px solid var(--border);
+      border-radius: 15px;
+      background:
+        linear-gradient(
+          145deg,
+          rgba(20, 31, 16, 0.97),
+          rgba(5, 8, 5, 0.97)
+        );
+      box-shadow:
+        0 18px 45px rgba(0, 0, 0, 0.45);
+    }
+
+    .stat small {
+      display: block;
+      margin-bottom: 6px;
+      color: var(--muted);
+      font-size: 10px;
+      font-weight: 1000;
+      letter-spacing: 1.2px;
+      text-transform: uppercase;
+    }
+
+    .stat strong {
+      color: var(--green);
+      font-size: 20px;
+      font-weight: 1000;
+    }
+
+    .layout {
+      display: grid;
+      grid-template-columns: 350px minmax(0, 1fr);
+      gap: 18px;
       align-items: start;
     }
 
     .panel {
-      padding: 24px;
+      overflow: hidden;
       border: 1px solid var(--border);
       border-radius: 22px;
-      background: linear-gradient(145deg, rgba(18, 25, 15, 0.97), rgba(5, 8, 5, 0.97));
+      background:
+        linear-gradient(
+          155deg,
+          var(--panel-2),
+          var(--panel)
+        );
       box-shadow:
-        0 20px 50px rgba(0, 0, 0, 0.45),
-        inset 0 0 25px rgba(173, 255, 0, 0.025);
+        0 20px 60px rgba(0, 0, 0, 0.5);
     }
 
-    .panel h2 {
-      margin-bottom: 8px;
-      font-size: 24px;
+    .setup {
+      padding: 24px;
+    }
+
+    .section-label {
+      color: var(--green);
+      font-size: 10px;
+      font-weight: 1000;
+      letter-spacing: 1.5px;
       text-transform: uppercase;
     }
 
-    .panel-description {
-      margin-bottom: 20px;
+    h2 {
+      margin-top: 4px;
+      font-size: 24px;
+      font-weight: 1000;
+      text-transform: uppercase;
+    }
+
+    .description {
+      margin-top: 8px;
+      margin-bottom: 18px;
       color: var(--muted);
-      font-size: 14px;
-      line-height: 1.5;
+      font-size: 13px;
+      line-height: 1.55;
     }
 
     label {
       display: block;
-      margin: 16px 0 8px;
-      color: #d8dfd4;
-      font-size: 13px;
-      font-weight: 800;
-      letter-spacing: 0.8px;
+      margin: 15px 0 8px;
+      color: #dbe2d8;
+      font-size: 11px;
+      font-weight: 1000;
+      letter-spacing: 1.1px;
       text-transform: uppercase;
     }
 
-    textarea,
-    input {
-      width: 100%;
-      border: 1px solid #34452b;
-      border-radius: 12px;
-      outline: none;
-      color: white;
-      background: #070a07;
-      transition: 0.2s;
-    }
-
     textarea {
-      min-height: 210px;
+      width: 100%;
+      min-height: 290px;
       padding: 14px;
       resize: vertical;
+      outline: none;
+      border: 1px solid rgba(168, 255, 0, 0.25);
+      border-radius: 12px;
+      color: white;
+      background: rgba(0, 0, 0, 0.72);
+      font-family: "Courier New", monospace;
+      font-size: 12px;
       line-height: 1.6;
+      transition: 0.2s ease;
     }
 
-    input {
-      padding: 13px 14px;
-    }
-
-    textarea:focus,
-    input:focus {
+    textarea:focus {
       border-color: var(--green);
-      box-shadow: 0 0 0 3px rgba(173, 255, 0, 0.12);
+      box-shadow:
+        0 0 0 3px rgba(168, 255, 0, 0.1);
+    }
+
+    .control-row {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 10px;
+      margin-top: 12px;
+    }
+
+    .control-button {
+      padding: 12px;
+      border: 1px solid rgba(168, 255, 0, 0.33);
+      border-radius: 11px;
+      cursor: pointer;
+      color: var(--green);
+      background: rgba(5, 15, 4, 0.9);
+      font-size: 11px;
+      font-weight: 1000;
+      letter-spacing: 0.7px;
+      text-transform: uppercase;
+    }
+
+    .control-button.off {
+      color: #90998d;
+      border-color: rgba(255, 255, 255, 0.15);
     }
 
     .start-button {
       width: 100%;
-      margin-top: 20px;
+      margin-top: 12px;
       padding: 16px;
       border: 0;
-      border-radius: 12px;
+      border-radius: 13px;
       cursor: pointer;
       color: #071000;
-      background: linear-gradient(135deg, var(--yellow), var(--green));
+      background:
+        linear-gradient(
+          135deg,
+          var(--yellow),
+          var(--green)
+        );
+      box-shadow:
+        0 0 25px rgba(168, 255, 0, 0.28),
+        inset 0 0 18px rgba(255, 255, 255, 0.35);
+      font-size: 16px;
       font-weight: 1000;
-      font-size: 17px;
+      letter-spacing: 0.7px;
       text-transform: uppercase;
-      box-shadow: 0 0 25px rgba(173, 255, 0, 0.3);
-      transition: transform 0.2s, filter 0.2s;
+      transition:
+        transform 0.2s,
+        filter 0.2s;
     }
 
     .start-button:hover {
       transform: translateY(-2px);
-      filter: brightness(1.1);
+      filter: brightness(1.08);
     }
 
-    .start-button:disabled {
+    .start-button:disabled,
+    .control-button:disabled {
       cursor: not-allowed;
       opacity: 0.45;
       transform: none;
     }
 
-    .warning {
-      margin-top: 14px;
-      color: #849080;
-      font-size: 12px;
-      line-height: 1.45;
+    .note {
+      margin-top: 13px;
+      padding: 12px;
+      border: 1px solid rgba(244, 255, 0, 0.17);
+      border-radius: 10px;
+      color: #9ca596;
+      background: rgba(244, 255, 0, 0.035);
+      font-size: 11px;
+      line-height: 1.5;
       text-align: center;
     }
 
     .race-panel {
-      min-height: 520px;
+      min-height: 660px;
+    }
+
+    .race-top {
+      padding: 22px 24px 18px;
+      border-bottom: 1px solid rgba(168, 255, 0, 0.14);
+      background:
+        linear-gradient(
+          90deg,
+          rgba(168, 255, 0, 0.07),
+          transparent
+        );
     }
 
     .race-header {
       display: flex;
-      justify-content: space-between;
-      gap: 15px;
       align-items: center;
-      margin-bottom: 22px;
+      justify-content: space-between;
+      gap: 16px;
+    }
+
+    .race-info {
+      display: flex;
+      align-items: center;
+      gap: 11px;
     }
 
     .status {
-      padding: 9px 15px;
-      border: 1px solid #35511c;
+      padding: 10px 14px;
+      border: 1px solid rgba(168, 255, 0, 0.45);
       border-radius: 999px;
       color: var(--green);
-      background: #0b1207;
-      font-size: 13px;
-      font-weight: 900;
+      background: rgba(3, 11, 2, 0.9);
+      font-size: 11px;
+      font-weight: 1000;
+      letter-spacing: 0.8px;
       text-transform: uppercase;
+    }
+
+    .timer {
+      min-width: 106px;
+      padding: 8px 13px;
+      border: 2px solid var(--yellow);
+      border-radius: 12px;
+      color: var(--yellow);
+      background: rgba(0, 0, 0, 0.82);
+      box-shadow:
+        0 0 22px rgba(244, 255, 0, 0.25);
+      font-family: "Courier New", monospace;
+      font-size: 25px;
+      font-weight: 1000;
+      letter-spacing: 2px;
+      text-align: center;
+    }
+
+    .timer.danger {
+      color: white;
+      border-color: var(--red);
+      background:
+        linear-gradient(
+          #7c070e,
+          #210003
+        );
+      box-shadow:
+        0 0 30px rgba(255, 48, 69, 0.68);
+      animation:
+        timerPulse 0.42s infinite alternate;
+    }
+
+    .narrator {
+      position: relative;
+      min-height: 66px;
+      margin-top: 16px;
+      padding: 14px 16px;
+      display: flex;
+      align-items: center;
+      gap: 11px;
+      overflow: hidden;
+      border: 1px solid rgba(168, 255, 0, 0.35);
+      border-radius: 14px;
+      background:
+        linear-gradient(
+          90deg,
+          rgba(168, 255, 0, 0.14),
+          rgba(3, 7, 3, 0.96) 48%
+        );
+    }
+
+    .narrator::after {
+      content: "";
+      position: absolute;
+      top: 0;
+      left: -45%;
+      width: 28%;
+      height: 100%;
+      background:
+        linear-gradient(
+          90deg,
+          transparent,
+          rgba(168, 255, 0, 0.1),
+          transparent
+        );
+      animation:
+        scan 3.2s linear infinite;
+    }
+
+    .live-dot {
+      position: relative;
+      z-index: 2;
+      width: 10px;
+      height: 10px;
+      flex-shrink: 0;
+      border-radius: 50%;
+      background: var(--red);
+      box-shadow:
+        0 0 14px var(--red);
+      animation:
+        livePulse 0.65s infinite alternate;
+    }
+
+    .voice-bars {
+      position: relative;
+      z-index: 2;
+      height: 24px;
+      display: flex;
+      align-items: center;
+      gap: 3px;
+    }
+
+    .voice-bars i {
+      width: 3px;
+      height: 8px;
+      display: block;
+      border-radius: 3px;
+      background: var(--green);
+      box-shadow:
+        0 0 7px rgba(168, 255, 0, 0.65);
+      animation:
+        voiceBar 0.55s infinite alternate;
+    }
+
+    .voice-bars i:nth-child(2) {
+      animation-delay: 0.12s;
+    }
+
+    .voice-bars i:nth-child(3) {
+      animation-delay: 0.24s;
+    }
+
+    .voice-bars i:nth-child(4) {
+      animation-delay: 0.36s;
+    }
+
+    .narrator strong,
+    .narrator span {
+      position: relative;
+      z-index: 2;
+    }
+
+    .narrator strong {
+      flex-shrink: 0;
+      color: var(--green);
+      font-size: 11px;
+      font-weight: 1000;
+      letter-spacing: 1px;
+    }
+
+    #narratorText {
+      color: #e9f2e5;
+      font-size: 13px;
+      font-weight: 750;
+      line-height: 1.45;
+    }
+
+    .track-wrap {
+      padding: 19px;
     }
 
     .track {
       position: relative;
-      min-height: 400px;
+      min-height: 505px;
+      padding: 17px 78px 17px 15px;
       overflow: hidden;
-      border: 1px solid #30382c;
+      border: 1px solid rgba(168, 255, 0, 0.18);
       border-radius: 18px;
-      padding: 16px 64px 16px 15px;
       background:
-        linear-gradient(90deg, rgba(173, 255, 0, 0.025), transparent),
+        linear-gradient(
+          90deg,
+          rgba(168, 255, 0, 0.045),
+          transparent 65%
+        ),
         repeating-linear-gradient(
           0deg,
-          #111611 0,
-          #111611 58px,
-          #252c23 59px,
-          #252c23 61px
+          #101510 0,
+          #101510 61px,
+          #252c23 62px,
+          #252c23 64px
         );
+      box-shadow:
+        inset 0 0 45px rgba(0, 0, 0, 0.72);
+    }
+
+    .track::before {
+      content: "";
+      position: absolute;
+      inset: 0;
+      pointer-events: none;
+      opacity: 0.22;
+      background-image:
+        linear-gradient(
+          90deg,
+          transparent 49%,
+          rgba(168, 255, 0, 0.13) 50%,
+          transparent 51%
+        );
+      background-size: 12% 100%;
     }
 
     .finish-line {
       position: absolute;
       z-index: 1;
       top: 0;
-      right: 40px;
-      width: 24px;
+      right: 44px;
+      width: 28px;
       height: 100%;
-      opacity: 0.8;
       background:
         conic-gradient(
           #fff 25%,
-          #111 0 50%,
+          #080808 0 50%,
           #fff 0 75%,
-          #111 0
-        ) 0 0 / 24px 24px;
-      box-shadow: 0 0 18px rgba(255, 255, 255, 0.28);
+          #080808 0
+        ) 0 0 / 28px 28px;
+      box-shadow:
+        -4px 0 18px rgba(255, 255, 255, 0.2),
+        4px 0 18px rgba(168, 255, 0, 0.18);
     }
 
     .finish-label {
       position: absolute;
       z-index: 2;
-      top: 10px;
+      top: 13px;
       right: 12px;
       color: var(--yellow);
-      font-size: 11px;
+      font-size: 10px;
       font-weight: 1000;
-      writing-mode: vertical-rl;
+      letter-spacing: 1.2px;
       text-transform: uppercase;
+      writing-mode: vertical-rl;
     }
 
     .lane {
       position: relative;
-      height: 61px;
+      height: 64px;
     }
 
-    .racer {
+    .car {
       position: absolute;
       z-index: 3;
       top: 8px;
       left: 0;
-      width: 150px;
-      height: 45px;
+      width: 196px;
+      height: 48px;
+      padding: 5px 10px 5px 7px;
       display: flex;
       align-items: center;
       gap: 9px;
-      padding: 5px 9px;
-      border: 1px solid #4d652b;
-      border-radius: 12px;
-      background: linear-gradient(135deg, #1f2d12, #080b07);
-      box-shadow: 0 7px 15px rgba(0, 0, 0, 0.45);
+      border: 1px solid rgba(168, 255, 0, 0.4);
+      border-radius: 14px 18px 12px 14px;
+      background:
+        linear-gradient(
+          145deg,
+          rgba(37, 54, 23, 0.98),
+          rgba(4, 7, 4, 0.98)
+        );
+      box-shadow:
+        0 9px 16px rgba(0, 0, 0, 0.52);
       transform: translateX(0);
       will-change: transform;
     }
 
-    .racer-icon {
-      position: relative;
-      width: 38px;
-      height: 31px;
-      flex-shrink: 0;
-      border: 2px solid var(--green);
-      border-radius: 7px;
-      background: #090b09;
-      box-shadow: 0 0 9px rgba(173, 255, 0, 0.25);
-    }
-
-    .racer-icon::before,
-    .racer-icon::after {
+    .car::after {
       content: "";
       position: absolute;
-      bottom: -7px;
-      width: 10px;
-      height: 10px;
-      border: 2px solid #566247;
-      border-radius: 50%;
-      background: #050505;
+      right: -13px;
+      top: 12px;
+      width: 20px;
+      height: 22px;
+      border: 1px solid rgba(168, 255, 0, 0.45);
+      border-left: 0;
+      border-radius: 0 14px 14px 0;
+      background:
+        linear-gradient(
+          90deg,
+          #15210f,
+          #050705
+        );
     }
 
-    .racer-icon::before {
-      left: 3px;
+    .car.racing {
+      border-color: rgba(168, 255, 0, 0.86);
+      box-shadow:
+        0 9px 16px rgba(0, 0, 0, 0.52),
+        0 0 18px rgba(168, 255, 0, 0.25);
     }
 
-    .racer-icon::after {
-      right: 3px;
-    }
-
-    .solana-mark {
+    .speed-lines {
       position: absolute;
-      inset: 0;
-      display: grid;
-      place-items: center;
-      color: var(--green);
-      font-size: 16px;
-      font-weight: 1000;
+      left: -25px;
+      width: 20px;
+      height: 3px;
+      opacity: 0;
+      border-radius: 10px;
+      background: var(--yellow);
+      box-shadow:
+        5px 9px 0 var(--green),
+        -1px 18px 0 var(--cyan);
     }
 
-    .wallet-name {
+    .car.racing .speed-lines {
+      opacity: 0.9;
+      animation:
+        speedLines 0.24s infinite alternate;
+    }
+
+    .car-logo {
+      width: 38px;
+      height: 38px;
+      flex-shrink: 0;
+      object-fit: cover;
+      border: 1px solid rgba(168, 255, 0, 0.58);
+      border-radius: 9px;
+      background: black;
+      box-shadow:
+        0 0 11px rgba(168, 255, 0, 0.2);
+    }
+
+    .car-copy {
       min-width: 0;
+      flex: 1;
     }
 
-    .wallet-name strong {
+    .car-copy strong {
       display: block;
       overflow: hidden;
       color: white;
@@ -394,146 +780,296 @@
       white-space: nowrap;
     }
 
-    .wallet-name small {
+    .car-copy small {
       color: var(--green);
-      font-size: 10px;
-      font-weight: 800;
+      font-size: 9px;
+      font-weight: 1000;
+      letter-spacing: 0.8px;
     }
 
-    .speed-lines {
-      position: absolute;
-      left: -26px;
-      width: 20px;
-      height: 2px;
-      opacity: 0;
-      background: var(--yellow);
-      box-shadow:
-        5px 8px 0 var(--green),
-        0 16px 0 var(--yellow);
-    }
-
-    .racing .speed-lines {
-      opacity: 0.75;
-    }
-
-    .empty-state {
-      min-height: 390px;
+    .position {
+      min-width: 27px;
+      height: 27px;
       display: grid;
       place-items: center;
-      padding: 30px;
-      text-align: center;
-      color: #899386;
+      border: 1px solid rgba(255, 255, 255, 0.13);
+      border-radius: 8px;
+      color: var(--yellow);
+      background: rgba(0, 0, 0, 0.65);
+      font-size: 10px;
+      font-weight: 1000;
     }
 
-    .empty-state span {
+    .wheel {
+      position: absolute;
+      bottom: -8px;
+      width: 14px;
+      height: 14px;
+      border: 3px solid #596151;
+      border-radius: 50%;
+      background: #020302;
+      box-shadow:
+        inset 0 0 0 2px #111;
+    }
+
+    .wheel::after {
+      content: "";
+      position: absolute;
+      inset: 3px;
+      border-radius: 50%;
+      background: var(--green);
+      opacity: 0.7;
+    }
+
+    .wheel.front {
+      right: 22px;
+    }
+
+    .wheel.back {
+      left: 22px;
+    }
+
+    .car.racing .wheel {
+      animation:
+        wheelSpin 0.2s linear infinite;
+    }
+
+    .empty {
+      min-height: 470px;
+      display: grid;
+      place-items: center;
+      color: #909a8d;
+      text-align: center;
+    }
+
+    .empty span {
       display: block;
       margin-bottom: 12px;
-      font-size: 70px;
+      font-size: 68px;
     }
 
     .winner-modal {
       position: fixed;
-      z-index: 50;
+      z-index: 70;
       inset: 0;
       display: none;
       align-items: center;
       justify-content: center;
       padding: 20px;
-      background: rgba(0, 0, 0, 0.83);
-      backdrop-filter: blur(10px);
+      background: rgba(0, 0, 0, 0.88);
+      backdrop-filter: blur(11px);
     }
 
     .winner-modal.show {
       display: flex;
-      animation: fadeIn 0.3s ease;
+      animation:
+        fadeIn 0.3s ease;
     }
 
     .winner-card {
-      width: min(540px, 100%);
-      padding: 35px 25px;
+      width: min(570px, 100%);
+      padding: 34px 25px 28px;
       border: 2px solid var(--green);
       border-radius: 28px;
       text-align: center;
       background:
-        radial-gradient(circle at top, #263d0e, #070a06 62%);
+        radial-gradient(
+          circle at 50% 0%,
+          rgba(168, 255, 0, 0.25),
+          transparent 45%
+        ),
+        linear-gradient(
+          160deg,
+          #10200b,
+          #030503 68%
+        );
       box-shadow:
-        0 0 60px rgba(173, 255, 0, 0.35),
-        inset 0 0 35px rgba(173, 255, 0, 0.08);
-      animation: winnerPop 0.55s ease;
+        0 0 70px rgba(168, 255, 0, 0.33);
+      animation:
+        winnerPop 0.55s ease;
+    }
+
+    .winner-card img {
+      width: 94px;
+      height: 94px;
+      border: 2px solid var(--green);
+      border-radius: 50%;
+      object-fit: cover;
+      box-shadow:
+        0 0 32px rgba(168, 255, 0, 0.48);
     }
 
     .trophy {
-      display: inline-block;
-      font-size: 100px;
-      filter: drop-shadow(0 0 25px rgba(255, 245, 0, 0.65));
-      animation: trophyBounce 1s infinite alternate ease-in-out;
+      margin-top: -16px;
+      font-size: 92px;
+      filter:
+        drop-shadow(
+          0 0 25px rgba(244, 255, 0, 0.58)
+        );
+      animation:
+        trophyBounce 0.85s infinite alternate;
     }
 
-    .winner-card h2 {
-      margin: 14px 0 8px;
+    .winner-card h3 {
       color: var(--yellow);
-      font-size: clamp(30px, 7vw, 54px);
+      font-size: clamp(36px, 7vw, 58px);
       font-weight: 1000;
+      font-style: italic;
       text-transform: uppercase;
     }
 
     .winner-card p {
-      color: #b5c1b0;
+      color: #b4beae;
     }
 
     .winner-wallet {
-      margin: 22px 0 12px;
-      padding: 16px;
+      margin: 21px 0 22px;
+      padding: 15px;
       overflow-wrap: anywhere;
-      border: 1px solid #4a642c;
-      border-radius: 14px;
+      border: 1px solid rgba(168, 255, 0, 0.38);
+      border-radius: 13px;
       color: white;
-      background: rgba(0, 0, 0, 0.5);
-      font-family: monospace;
-      font-size: 15px;
+      background: rgba(0, 0, 0, 0.55);
+      font-family: "Courier New", monospace;
+      font-size: 14px;
     }
 
-    .prize-text {
-      margin-bottom: 22px;
-      color: var(--green);
-      font-size: 24px;
-      font-weight: 1000;
-    }
-
-    .close-button {
-      padding: 13px 30px;
+    .race-again {
+      padding: 13px 31px;
       border: 0;
       border-radius: 12px;
       cursor: pointer;
-      color: #081000;
-      background: linear-gradient(135deg, var(--yellow), var(--green));
+      color: #071000;
+      background:
+        linear-gradient(
+          135deg,
+          var(--yellow),
+          var(--green)
+        );
       font-weight: 1000;
+      letter-spacing: 0.5px;
+      text-transform: uppercase;
     }
 
     #confettiCanvas {
       position: fixed;
-      z-index: 49;
+      z-index: 69;
       inset: 0;
       width: 100%;
       height: 100%;
       pointer-events: none;
     }
 
+    .toast {
+      position: fixed;
+      z-index: 90;
+      left: 50%;
+      bottom: 28px;
+      display: none;
+      transform: translateX(-50%);
+      padding: 12px 18px;
+      border: 1px solid rgba(168, 255, 0, 0.4);
+      border-radius: 999px;
+      color: var(--green);
+      background: rgba(0, 0, 0, 0.9);
+      font-size: 12px;
+      font-weight: 900;
+      letter-spacing: 0.6px;
+      text-transform: uppercase;
+    }
+
+    .toast.show {
+      display: block;
+      animation:
+        fadeIn 0.2s ease;
+    }
+
     footer {
-      padding: 25px;
-      border-top: 1px solid #23301c;
-      color: #768070;
+      padding: 28px;
+      border-top: 1px solid rgba(168, 255, 0, 0.14);
+      color: #747e71;
+      font-size: 12px;
       text-align: center;
-      font-size: 13px;
     }
 
     footer strong {
       color: var(--green);
     }
 
+    @keyframes timerPulse {
+      from {
+        transform: scale(1);
+      }
+
+      to {
+        transform: scale(1.08);
+      }
+    }
+
+    @keyframes livePulse {
+      from {
+        opacity: 0.35;
+        transform: scale(0.8);
+      }
+
+      to {
+        opacity: 1;
+        transform: scale(1.16);
+      }
+    }
+
+    @keyframes voiceBar {
+      from {
+        height: 6px;
+        opacity: 0.4;
+      }
+
+      to {
+        height: 23px;
+        opacity: 1;
+      }
+    }
+
+    @keyframes scan {
+      from {
+        left: -45%;
+      }
+
+      to {
+        left: 120%;
+      }
+    }
+
+    @keyframes speedLines {
+      from {
+        transform: translateX(0);
+        opacity: 0.35;
+      }
+
+      to {
+        transform: translateX(-8px);
+        opacity: 1;
+      }
+    }
+
+    @keyframes wheelSpin {
+      from {
+        transform: rotate(0deg);
+      }
+
+      to {
+        transform: rotate(360deg);
+      }
+    }
+
     @keyframes fadeIn {
-      from { opacity: 0; }
-      to { opacity: 1; }
+      from {
+        opacity: 0;
+      }
+
+      to {
+        opacity: 1;
+      }
     }
 
     @keyframes winnerPop {
@@ -541,6 +1077,7 @@
         opacity: 0;
         transform: scale(0.65) rotate(-3deg);
       }
+
       to {
         opacity: 1;
         transform: scale(1) rotate(0);
@@ -548,868 +1085,2096 @@
     }
 
     @keyframes trophyBounce {
-      from { transform: translateY(0) rotate(-4deg); }
-      to { transform: translateY(-12px) rotate(4deg); }
+      from {
+        transform: translateY(0) rotate(-4deg);
+      }
+
+      to {
+        transform: translateY(-11px) rotate(4deg);
+      }
     }
 
-    @media (max-width: 850px) {
-      .dashboard {
+    @media (max-width: 1000px) {
+      .layout {
         grid-template-columns: 1fr;
       }
 
-      .hero {
-        min-height: 270px;
+      .stats {
+        grid-template-columns: repeat(2, 1fr);
+      }
+    }
+
+    @media (max-width: 700px) {
+      .nav {
+        align-items: flex-start;
+        flex-direction: column;
       }
 
-      .navbar {
-        padding: 14px 4%;
+      .nav-actions {
+        width: 100%;
+        justify-content: flex-start;
       }
 
-      .brand {
-        font-size: 17px;
+      .hero h1 {
+        letter-spacing: -2px;
       }
 
-      .brand-logo {
-        width: 44px;
-        height: 44px;
+      .race-header {
+        align-items: flex-start;
+        flex-direction: column;
       }
 
-      .nav-badge {
-        display: none;
+      .race-info {
+        width: 100%;
+        justify-content: space-between;
+      }
+
+      .narrator {
+        flex-wrap: wrap;
+      }
+
+      #narratorText {
+        width: 100%;
       }
 
       .track {
-        padding-right: 48px;
+        padding-right: 58px;
       }
 
       .finish-line {
-        right: 27px;
+        right: 29px;
       }
 
       .finish-label {
-        right: 4px;
+        right: 3px;
       }
 
-      .racer {
-        width: 128px;
+      .car {
+        width: 154px;
+      }
+
+      .position {
+        display: none;
       }
     }
   </style>
 </head>
 
 <body>
-
   <canvas id="confettiCanvas"></canvas>
 
+  <div id="toast" class="toast">
+    Coming soon
+  </div>
+
   <header class="hero">
-    <nav class="navbar">
+    <nav class="nav">
       <div class="brand">
         <img
           src="logo.png"
           alt="Wallet Racers logo"
-          class="brand-logo"
-          onerror="this.style.display='none'"
         >
+
         Wallet Racers
       </div>
 
-      <div class="nav-badge">Built on Solana</div>
+      <div class="nav-actions">
+        <button
+          id="xButton"
+          class="nav-button"
+          type="button"
+        >
+          X
+        </button>
+
+        <button
+          id="caButton"
+          class="nav-button"
+          type="button"
+        >
+          CA
+        </button>
+
+        <button
+          id="buyButton"
+          class="nav-button buy"
+          type="button"
+        >
+          Buy
+        </button>
+      </div>
     </nav>
 
     <div class="hero-content">
-      <h1>Wallet <span>Racers</span></h1>
-      <p>Every wallet deserves a race.</p>
+      <div class="eyebrow">
+        The ultimate wallet race
+      </div>
+
+      <h1>
+        Wallet <span>Racers</span>
+      </h1>
+
+      <p>
+        Every eligible coin buyer enters the arena.
+        Wallet-powered cars race for forty seconds
+        with live commentary, roaring engines and
+        a final crowd ovation.
+      </p>
     </div>
   </header>
 
-  <main class="container">
-    <section class="dashboard">
+  <main class="main">
+    <section class="stats">
+      <article class="stat">
+        <small>Network</small>
+        <strong>Solana</strong>
+      </article>
 
-      <aside class="panel">
-        <h2>Race setup</h2>
+      <article class="stat">
+        <small>Race duration</small>
+        <strong>40 seconds</strong>
+      </article>
 
-        <p class="panel-description">
-          Add one wallet per line. A maximum of 10 wallets can participate.
+      <article class="stat">
+        <small>Participants</small>
+        <strong id="participantsStat">
+          0 / 10
+        </strong>
+      </article>
+
+      <article class="stat">
+        <small>Eligibility</small>
+        <strong>Coin Buyers</strong>
+      </article>
+    </section>
+
+    <section class="layout">
+      <aside class="panel setup">
+        <div class="section-label">
+          Race control
+        </div>
+
+        <h2>Participants</h2>
+
+        <p class="description">
+          Paste one eligible wallet per line.
+          Every listed wallet has the same chance to win.
         </p>
 
-        <label for="wallets">Wallet addresses</label>
+        <label for="wallets">
+          Eligible wallet addresses
+        </label>
 
-        <textarea id="wallets">7xKXtg2CW87d97TXJSDpbD5jBkheTqA83TZRuJosg1F
+        <textarea
+          id="wallets"
+          spellcheck="false"
+        >7xKXtg2CW87d97TXJSDpbD5jBkheTqA83TZRuJosg1F
 9mYaLhZd9YVZr1fVVLmJuJn8KPkYhTwMNFvLGx7zS2p
 B2PHQ3hYfU1sJ3Y1tBVd3R6nh8nXLQfJas6wZkJQH8N
 D7zC8wnYaxKpuUGdUwhBjpjbT2zu1vEc1dPF8GJvX5T
 Fo83Nq7oXLhczWRJrWQ2Cq6KAK2nVL65TCKfJxQUG8g</textarea>
 
-        <label for="prize">Demo prize in SOL</label>
+        <div class="control-row">
+          <button
+            id="soundButton"
+            class="control-button"
+            type="button"
+          >
+            Sound On
+          </button>
 
-        <input
-          id="prize"
-          type="number"
-          min="0"
-          step="0.01"
-          value="1"
+          <button
+            id="voiceButton"
+            class="control-button"
+            type="button"
+          >
+            Voice On
+          </button>
+        </div>
+
+        <button
+          id="startButton"
+          class="start-button"
+          type="button"
         >
-
-        <button id="startButton" class="start-button">
           Start Race
         </button>
 
-        <p class="warning">
-          Demo mode only. This version does not transfer real SOL and does not
-          request private keys.
+        <p class="note">
+          Demo mode. This version uses manually entered
+          wallets and does not request private keys.
         </p>
       </aside>
 
       <section class="panel race-panel">
-        <div class="race-header">
-          <div>
-            <h2>Live race</h2>
-            <p class="panel-description" style="margin: 5px 0 0;">
-              First wallet to cross the finish line wins.
-            </p>
+        <div class="race-top">
+          <div class="race-header">
+            <div>
+              <div class="section-label">
+                Broadcast arena
+              </div>
+
+              <h2>Live Race</h2>
+
+              <p
+                class="description"
+                style="margin: 6px 0 0;"
+              >
+                Nobody crosses the finish line before
+                the timer reaches zero.
+              </p>
+            </div>
+
+            <div class="race-info">
+              <div
+                id="status"
+                class="status"
+              >
+                Waiting
+              </div>
+
+              <div
+                id="timer"
+                class="timer"
+              >
+                00:40
+              </div>
+            </div>
           </div>
 
-          <div id="status" class="status">Waiting</div>
+          <div
+            class="narrator"
+            aria-live="polite"
+          >
+            <span class="live-dot"></span>
+
+            <div
+              class="voice-bars"
+              aria-hidden="true"
+            >
+              <i></i>
+              <i></i>
+              <i></i>
+              <i></i>
+            </div>
+
+            <strong>WRACE LIVE</strong>
+
+            <span id="narratorText">
+              Add the eligible wallets and get ready
+              for the race.
+            </span>
+          </div>
         </div>
 
-        <div id="track" class="track">
-             const walletsInput = document.getElementById("wallets");
-    const prizeInput = document.getElementById("prize");
-    const startButton = document.getElementById("startButton");
-    const track = document.getElementById("track");
-    const statusElement = document.getElementById("status");
-    const raceTimer = document.getElementById("raceTimer");
-    const narratorText = document.getElementById("narratorText");
-    const winnerModal = document.getElementById("winnerModal");
-    const winnerWallet = document.getElementById("winnerWallet");
-    const prizeText = document.getElementById("prizeText");
-    const closeButton = document.getElementById("closeButton");
+        <div class="track-wrap">
+          <div
+            id="track"
+            class="track"
+          >
+            <div class="finish-line"></div>
+
+            <div class="finish-label">
+              Finish
+            </div>
+
+            <div class="empty">
+              <div>
+                <span>🏁</span>
+
+                Enter the wallets and press
+                <strong>Start Race</strong>.
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+    </section>
+  </main>
+
+  <div
+    id="winnerModal"
+    class="winner-modal"
+  >
+    <div class="winner-card">
+      <img
+        src="logo.png"
+        alt="Wallet Racers"
+      >
+
+      <div class="trophy">
+        🏆
+      </div>
+
+      <h3>Winner!</h3>
+
+      <p>
+        The champion wallet is:
+      </p>
+
+      <div
+        id="winnerWallet"
+        class="winner-wallet"
+      ></div>
+
+      <button
+        id="raceAgainButton"
+        class="race-again"
+        type="button"
+      >
+        Race Again
+      </button>
+    </div>
+  </div>
+
+  <footer>
+    <strong>Wallet Racers</strong>
+    · Buy. Race. HODL. Win.
+  </footer>
+
+  <script>
+    /*
+      WE WILL REPLACE THESE THREE VALUES AT THE END.
+    */
+
+    const X_LINK = "#";
+
+    const CONTRACT_ADDRESS =
+      "COMING SOON";
+
+    const BUY_LINK = "#";
+
+    const RACE_DURATION = 40000;
+    const MAX_WALLETS = 10;
+
+    const walletsInput =
+      document.getElementById("wallets");
+
+    const startButton =
+      document.getElementById("startButton");
+
+    const soundButton =
+      document.getElementById("soundButton");
+
+    const voiceButton =
+      document.getElementById("voiceButton");
+
+    const track =
+      document.getElementById("track");
+
+    const statusElement =
+      document.getElementById("status");
+
+    const timerElement =
+      document.getElementById("timer");
+
+    const narratorText =
+      document.getElementById("narratorText");
+
+    const participantsStat =
+      document.getElementById("participantsStat");
+
+    const winnerModal =
+      document.getElementById("winnerModal");
+
+    const winnerWallet =
+      document.getElementById("winnerWallet");
+
+    const raceAgainButton =
+      document.getElementById("raceAgainButton");
+
+    const xButton =
+      document.getElementById("xButton");
+
+    const caButton =
+      document.getElementById("caButton");
+
+    const buyButton =
+      document.getElementById("buyButton");
+
+    const toast =
+      document.getElementById("toast");
 
     let raceRunning = false;
-    let narrationEventIndex = 0;
+    let soundEnabled = true;
+    let voiceEnabled = true;
+    let narrationIndex = 0;
 
     let audioContext = null;
-    let suspenseOscillator = null;
-    let suspenseGain = null;
-
-    function shortWallet(wallet) {
-      if (wallet.length <= 13) return wallet;
-
-      return wallet.slice(0, 6) + "..." + wallet.slice(-5);
-    }
+    let engineOscillatorOne = null;
+    let engineOscillatorTwo = null;
+    let engineGain = null;
+    let engineFilter = null;
 
     function getWallets() {
-      return walletsInput.value
-        .split("\n")
-        .map(wallet => wallet.trim())
-        .filter(Boolean)
-        .slice(0, 10);
+      const wallets =
+        walletsInput.value
+          .split("\n")
+          .map(wallet => wallet.trim())
+          .filter(Boolean);
+
+      return [
+        ...new Set(wallets)
+      ].slice(0, MAX_WALLETS);
+    }
+
+    function shortWallet(wallet) {
+      if (wallet.length <= 15) {
+        return wallet;
+      }
+
+      return (
+        wallet.slice(0, 7) +
+        "..." +
+        wallet.slice(-5)
+      );
+    }
+
+    function updateParticipants() {
+      participantsStat.textContent =
+        `${getWallets().length} / ${MAX_WALLETS}`;
     }
 
     function secureRandomIndex(max) {
-      if (max <= 0) return 0;
+      if (max <= 0) {
+        return 0;
+      }
 
-      const randomArray = new Uint32Array(1);
-      const maximumValidNumber =
-        Math.floor(0x100000000 / max) * max;
+      const values =
+        new Uint32Array(1);
 
-      let randomNumber;
+      const limit =
+        Math.floor(
+          0x100000000 / max
+        ) * max;
+
+      let value;
 
       do {
-        crypto.getRandomValues(randomArray);
-        randomNumber = randomArray[0];
-      } while (randomNumber >= maximumValidNumber);
+        crypto.getRandomValues(values);
+        value = values[0];
+      } while (value >= limit);
 
-      return randomNumber % max;
+      return value % max;
     }
 
     function randomBetween(min, max) {
-      const randomArray = new Uint32Array(1);
+      const values =
+        new Uint32Array(1);
 
-      crypto.getRandomValues(randomArray);
+      crypto.getRandomValues(values);
 
-      return min +
-        (randomArray[0] / 0xffffffff) *
-        (max - min);
+      return (
+        min +
+        (
+          values[0] /
+          0xffffffff
+        ) *
+        (max - min)
+      );
+    }
+
+    function showToast(message) {
+      toast.textContent = message;
+
+      toast.classList.add("show");
+
+      setTimeout(() => {
+        toast.classList.remove("show");
+      }, 1800);
+    }
+
+    function openProjectLink(
+      link,
+      label
+    ) {
+      if (
+        !link ||
+        link === "#"
+      ) {
+        showToast(
+          `${label} coming soon`
+        );
+
+        return;
+      }
+
+      window.open(
+        link,
+        "_blank",
+        "noopener,noreferrer"
+      );
+    }
+
+    async function handleContractButton() {
+      if (
+        CONTRACT_ADDRESS ===
+        "COMING SOON"
+      ) {
+        showToast(
+          "Contract address coming soon"
+        );
+
+        return;
+      }
+
+      try {
+        await navigator.clipboard.writeText(
+          CONTRACT_ADDRESS
+        );
+
+        showToast(
+          "Contract address copied"
+        );
+      } catch (error) {
+        showToast(
+          CONTRACT_ADDRESS
+        );
+      }
     }
 
     function prepareAudio() {
+      if (!soundEnabled) {
+        return;
+      }
+
       const AudioContextClass =
         window.AudioContext ||
         window.webkitAudioContext;
 
-      if (!AudioContextClass) return;
-
-      if (!audioContext) {
-        audioContext = new AudioContextClass();
+      if (!AudioContextClass) {
+        return;
       }
 
-      if (audioContext.state === "suspended") {
+      if (!audioContext) {
+        audioContext =
+          new AudioContextClass();
+      }
+
+      if (
+        audioContext.state ===
+        "suspended"
+      ) {
         audioContext.resume();
       }
     }
 
-    function startSuspenseSound() {
-      if (!audioContext || suspenseOscillator) return;
+    function playBeep(
+      frequency,
+      duration = 0.12,
+      volume = 0.06
+    ) {
+      if (
+        !soundEnabled ||
+        !audioContext
+      ) {
+        return;
+      }
 
-      suspenseOscillator =
+      const oscillator =
         audioContext.createOscillator();
 
-      suspenseGain =
+      const gain =
         audioContext.createGain();
 
-      suspenseOscillator.type = "sawtooth";
-      suspenseOscillator.frequency.value = 48;
-      suspenseGain.gain.value = 0.012;
+      const now =
+        audioContext.currentTime;
 
-      suspenseOscillator.connect(suspenseGain);
-      suspenseGain.connect(audioContext.destination);
+      oscillator.type = "square";
 
-      suspenseOscillator.start();
+      oscillator.frequency.value =
+        frequency;
+
+      gain.gain.setValueAtTime(
+        volume,
+        now
+      );
+
+      gain.gain.exponentialRampToValueAtTime(
+        0.0001,
+        now + duration
+      );
+
+      oscillator.connect(gain);
+
+      gain.connect(
+        audioContext.destination
+      );
+
+      oscillator.start(now);
+
+      oscillator.stop(
+        now + duration
+      );
     }
 
-    function updateSuspenseSound(progress) {
+    function startEngineSound() {
       if (
+        !soundEnabled ||
         !audioContext ||
-        !suspenseOscillator ||
-        !suspenseGain
+        engineGain
       ) {
         return;
       }
 
-      const currentTime = audioContext.currentTime;
+      engineOscillatorOne =
+        audioContext.createOscillator();
 
-      suspenseOscillator.frequency.setTargetAtTime(
-        48 + progress * 46,
-        currentTime,
-        0.12
+      engineOscillatorTwo =
+        audioContext.createOscillator();
+
+      engineGain =
+        audioContext.createGain();
+
+      engineFilter =
+        audioContext.createBiquadFilter();
+
+      engineOscillatorOne.type =
+        "sawtooth";
+
+      engineOscillatorTwo.type =
+        "square";
+
+      engineOscillatorOne.frequency.value =
+        58;
+
+      engineOscillatorTwo.frequency.value =
+        116;
+
+      engineFilter.type =
+        "lowpass";
+
+      engineFilter.frequency.value =
+        650;
+
+      engineFilter.Q.value =
+        1.4;
+
+      engineGain.gain.value =
+        0.012;
+
+      engineOscillatorOne.connect(
+        engineFilter
       );
 
-      suspenseGain.gain.setTargetAtTime(
-        0.012 + progress * 0.012,
-        currentTime,
-        0.15
+      engineOscillatorTwo.connect(
+        engineFilter
       );
+
+      engineFilter.connect(
+        engineGain
+      );
+
+      engineGain.connect(
+        audioContext.destination
+      );
+
+      engineOscillatorOne.start();
+
+      engineOscillatorTwo.start();
     }
 
-    function stopSuspenseSound() {
+    function updateEngineSound(progress) {
       if (
         !audioContext ||
-        !suspenseOscillator ||
-        !suspenseGain
+        !engineGain ||
+        !engineOscillatorOne ||
+        !engineOscillatorTwo
       ) {
         return;
       }
 
-      const currentTime = audioContext.currentTime;
+      const now =
+        audioContext.currentTime;
+
+      const rpmWave =
+        Math.sin(
+          progress * 90
+        ) * 8;
+
+      engineOscillatorOne.frequency
+        .setTargetAtTime(
+          58 +
+          progress * 95 +
+          rpmWave,
+          now,
+          0.08
+        );
+
+      engineOscillatorTwo.frequency
+        .setTargetAtTime(
+          116 +
+          progress * 185 +
+          rpmWave * 2,
+          now,
+          0.08
+        );
+
+      engineFilter.frequency
+        .setTargetAtTime(
+          650 +
+          progress * 1350,
+          now,
+          0.12
+        );
+
+      engineGain.gain
+        .setTargetAtTime(
+          0.012 +
+          progress * 0.018,
+          now,
+          0.1
+        );
+    }
+
+    function stopEngineSound() {
+      if (
+        !audioContext ||
+        !engineGain
+      ) {
+        engineOscillatorOne = null;
+        engineOscillatorTwo = null;
+        engineGain = null;
+        engineFilter = null;
+
+        return;
+      }
+
+      const now =
+        audioContext.currentTime;
+
+      const one =
+        engineOscillatorOne;
+
+      const two =
+        engineOscillatorTwo;
+
+      const gain =
+        engineGain;
+
+      engineOscillatorOne = null;
+      engineOscillatorTwo = null;
+      engineGain = null;
+      engineFilter = null;
 
       try {
-        suspenseGain.gain.setValueAtTime(
-          suspenseGain.gain.value,
-          currentTime
+        gain.gain.setValueAtTime(
+          Math.max(
+            gain.gain.value,
+            0.0001
+          ),
+          now
         );
 
-        suspenseGain.gain.exponentialRampToValueAtTime(
+        gain.gain.exponentialRampToValueAtTime(
           0.0001,
-          currentTime + 0.3
+          now + 0.35
         );
 
-        suspenseOscillator.stop(currentTime + 0.32);
-      } catch (error) {
-        console.log("Audio already stopped.");
-      }
+        one.stop(
+          now + 0.37
+        );
 
-      suspenseOscillator = null;
-      suspenseGain = null;
+        two.stop(
+          now + 0.37
+        );
+      } catch (error) {
+        console.log(
+          "Engine sound already stopped."
+        );
+      }
     }
 
-    function speak(text) {
-      if (!("speechSynthesis" in window)) return;
+    function playCrowdOvation() {
+      if (
+        !soundEnabled ||
+        !audioContext
+      ) {
+        return;
+      }
+
+      const duration = 3.6;
+
+      const sampleRate =
+        audioContext.sampleRate;
+
+      const buffer =
+        audioContext.createBuffer(
+          1,
+          sampleRate * duration,
+          sampleRate
+        );
+
+      const data =
+        buffer.getChannelData(0);
+
+      for (
+        let index = 0;
+        index < data.length;
+        index++
+      ) {
+        const time =
+          index / sampleRate;
+
+        const envelope =
+          Math.min(
+            1,
+            time * 3
+          ) *
+          Math.max(
+            0,
+            1 -
+            time / duration
+          );
+
+        data[index] =
+          (
+            Math.random() * 2 -
+            1
+          ) *
+          envelope;
+      }
+
+      const source =
+        audioContext.createBufferSource();
+
+      const bandpass =
+        audioContext.createBiquadFilter();
+
+      const gain =
+        audioContext.createGain();
+
+      source.buffer = buffer;
+
+      bandpass.type =
+        "bandpass";
+
+      bandpass.frequency.value =
+        1200;
+
+      bandpass.Q.value =
+        0.55;
+
+      const now =
+        audioContext.currentTime;
+
+      gain.gain.setValueAtTime(
+        0.0001,
+        now
+      );
+
+      gain.gain.exponentialRampToValueAtTime(
+        0.18,
+        now + 0.2
+      );
+
+      gain.gain.exponentialRampToValueAtTime(
+        0.0001,
+        now + duration
+      );
+
+      source.connect(
+        bandpass
+      );
+
+      bandpass.connect(
+        gain
+      );
+
+      gain.connect(
+        audioContext.destination
+      );
+
+      source.start(now);
+
+      [
+        0.25,
+        0.6,
+        1,
+        1.45,
+        2
+      ].forEach(
+        (delay, index) => {
+          setTimeout(() => {
+            playBeep(
+              720 + index * 55,
+              0.18,
+              0.035
+            );
+          }, delay * 1000);
+        }
+      );
+    }
+
+    function findEnglishVoice() {
+      const voices =
+        window.speechSynthesis
+          .getVoices();
+
+      return (
+        voices.find(
+          voice =>
+            voice.lang
+              .toLowerCase()
+              .startsWith("en-us")
+        ) ||
+
+        voices.find(
+          voice =>
+            voice.lang
+              .toLowerCase()
+              .startsWith("en-gb")
+        ) ||
+
+        voices.find(
+          voice =>
+            voice.lang
+              .toLowerCase()
+              .startsWith("en")
+        )
+      );
+    }
+
+    function speak(
+      text,
+      options = {}
+    ) {
+      if (
+        !voiceEnabled ||
+        !(
+          "speechSynthesis"
+          in window
+        )
+      ) {
+        return;
+      }
 
       window.speechSynthesis.cancel();
+
       window.speechSynthesis.resume();
 
       const message =
-        new SpeechSynthesisUtterance(text);
-
-      message.lang = "en-US";
-      message.rate = 0.88;
-      message.pitch = 0.72;
-      message.volume = 1;
-
-      const voices =
-        window.speechSynthesis.getVoices();
-
-      const englishVoice =
-        voices.find(voice =>
-          voice.lang.toLowerCase().startsWith("en-us")
-        ) ||
-        voices.find(voice =>
-          voice.lang.toLowerCase().startsWith("en-gb")
-        ) ||
-        voices.find(voice =>
-          voice.lang.toLowerCase().startsWith("en")
+        new SpeechSynthesisUtterance(
+          text
         );
 
-      if (englishVoice) {
-        message.voice = englishVoice;
+      message.lang =
+        "en-US";
+
+      message.rate =
+        options.rate || 0.9;
+
+      message.pitch =
+        options.pitch || 0.72;
+
+      message.volume =
+        1;
+
+      const voice =
+        findEnglishVoice();
+
+      if (voice) {
+        message.voice = voice;
       }
 
-      window.speechSynthesis.speak(message);
+      window.speechSynthesis.speak(
+        message
+      );
     }
 
-    function narrate(text, useVoice = true) {
-      narratorText.textContent = text;
+    function narrate(
+      text,
+      useVoice = true
+    ) {
+      narratorText.textContent =
+        text;
 
       if (useVoice) {
         speak(text);
       }
     }
 
-    function createRacers(wallets) {
+    function createCars(wallets) {
       track.innerHTML = `
         <div class="finish-line"></div>
-        <div class="finish-label">Finish</div>
+
+        <div class="finish-label">
+          Finish
+        </div>
       `;
 
-      wallets.forEach((wallet, index) => {
-        const lane = document.createElement("div");
+      wallets.forEach(
+        (wallet, index) => {
+          const lane =
+            document.createElement(
+              "div"
+            );
 
-        lane.className = "lane";
+          const car =
+            document.createElement(
+              "div"
+            );
 
-        lane.innerHTML = `
-          <div class="racer" data-index="${index}">
-            <div class="speed-lines"></div>
+          const speedLines =
+            document.createElement(
+              "div"
+            );
 
-            <div class="racer-icon">
-              <div class="solana-mark">S</div>
-            </div>
+          const logo =
+            document.createElement(
+              "img"
+            );
 
-            <div class="wallet-name">
-              <strong>${shortWallet(wallet)}</strong>
-              <small>
-                RACER ${String(index + 1).padStart(2, "0")}
-              </small>
-            </div>
-          </div>
-        `;
+          const copy =
+            document.createElement(
+              "div"
+            );
 
-        track.appendChild(lane);
-      });
+          const walletName =
+            document.createElement(
+              "strong"
+            );
+
+          const racerLabel =
+            document.createElement(
+              "small"
+            );
+
+          const position =
+            document.createElement(
+              "div"
+            );
+
+          const frontWheel =
+            document.createElement(
+              "span"
+            );
+
+          const backWheel =
+            document.createElement(
+              "span"
+            );
+
+          lane.className =
+            "lane";
+
+          car.className =
+            "car";
+
+          car.dataset.index =
+            String(index);
+
+          speedLines.className =
+            "speed-lines";
+
+          logo.className =
+            "car-logo";
+
+          logo.src =
+            "logo.png";
+
+          logo.alt =
+            "";
+
+          copy.className =
+            "car-copy";
+
+          walletName.textContent =
+            shortWallet(wallet);
+
+          racerLabel.textContent =
+            `RACER ${
+              String(index + 1)
+                .padStart(2, "0")
+            }`;
+
+          position.className =
+            "position";
+
+          position.textContent =
+            `#${index + 1}`;
+
+          frontWheel.className =
+            "wheel front";
+
+          backWheel.className =
+            "wheel back";
+
+          copy.append(
+            walletName,
+            racerLabel
+          );
+
+          car.append(
+            speedLines,
+            logo,
+            copy,
+            position,
+            frontWheel,
+            backWheel
+          );
+
+          lane.appendChild(car);
+
+          track.appendChild(lane);
+        }
+      );
+    }
+
+    function updateRanking(
+      cars,
+      percentages
+    ) {
+      const ranking =
+        percentages
+          .map(
+            (
+              percentage,
+              index
+            ) => ({
+              percentage,
+              index
+            })
+          )
+          .sort(
+            (first, second) =>
+              second.percentage -
+              first.percentage
+          );
+
+      ranking.forEach(
+        (
+          item,
+          rankIndex
+        ) => {
+          const position =
+            cars[item.index]
+              .querySelector(
+                ".position"
+              );
+
+          if (position) {
+            position.textContent =
+              `#${rankIndex + 1}`;
+          }
+        }
+      );
     }
 
     function startRace() {
-      if (raceRunning) return;
-
-      const wallets = getWallets();
-
-      if (wallets.length < 2) {
-        alert("Add at least 2 wallet addresses.");
+      if (raceRunning) {
         return;
       }
 
-      const prize = Number(prizeInput.value);
+      const wallets =
+        getWallets();
 
-      if (!Number.isFinite(prize) || prize < 0) {
-        alert("Enter a valid prize amount.");
+      if (wallets.length < 2) {
+        alert(
+          "Add at least 2 eligible wallet addresses."
+        );
+
         return;
       }
 
       prepareAudio();
 
       raceRunning = true;
-      narrationEventIndex = 0;
 
-      startButton.disabled = true;
-      walletsInput.disabled = true;
-      prizeInput.disabled = true;
+      narrationIndex = 0;
 
-      raceTimer.textContent = "00:40";
-      raceTimer.classList.remove("final-seconds");
+      startButton.disabled =
+        true;
 
-      createRacers(wallets);
+      walletsInput.disabled =
+        true;
 
-      const racers = [
-        ...document.querySelectorAll(".racer")
+      soundButton.disabled =
+        true;
+
+      voiceButton.disabled =
+        true;
+
+      timerElement.textContent =
+        "00:40";
+
+      timerElement.classList.remove(
+        "danger"
+      );
+
+      createCars(wallets);
+
+      const cars = [
+        ...document
+          .querySelectorAll(
+            ".car"
+          )
       ];
 
       const winnerIndex =
-        secureRandomIndex(wallets.length);
+        secureRandomIndex(
+          wallets.length
+        );
 
-      const finalPositions = racers.map(
-        (_, index) => {
-          if (index === winnerIndex) {
-            return 100;
+      const losingTargets =
+        cars.map(
+          (_, index) => {
+            if (
+              index ===
+              winnerIndex
+            ) {
+              return 100;
+            }
+
+            return randomBetween(
+              94.2,
+              98.2
+            );
           }
+        );
 
-          return randomBetween(92, 97);
-        }
-      );
+      statusElement.textContent =
+        "Get Ready";
 
       narrate(
         "Racers locked in. The countdown has begun.",
         false
       );
 
-      let countdown = 3;
+      let countdown =
+        3;
 
-      statusElement.textContent = "3";
-      speak("Three");
+      statusElement.textContent =
+        "3";
 
-      const countdownTimer = setInterval(() => {
-        countdown--;
+      playBeep(
+        520
+      );
 
-        if (countdown === 2) {
-          statusElement.textContent = "2";
-          speak("Two");
-          return;
+      speak(
+        "Three",
+        {
+          rate: 0.95,
+          pitch: 0.8
         }
+      );
 
-        if (countdown === 1) {
-          statusElement.textContent = "1";
-          speak("One");
-          return;
-        }
+      const countdownTimer =
+        setInterval(() => {
+          countdown--;
 
-        clearInterval(countdownTimer);
+          if (countdown === 2) {
+            statusElement.textContent =
+              "2";
 
-        statusElement.textContent = "RACING";
+            playBeep(
+              580
+            );
 
-        racers.forEach(racer => {
-          racer.classList.add("racing");
-        });
+            speak(
+              "Two",
+              {
+                rate: 0.95,
+                pitch: 0.8
+              }
+            );
 
-        startSuspenseSound();
+            return;
+          }
 
-        narrate(
-          "And they are off! Forty seconds now separate one wallet from victory."
-        );
+          if (countdown === 1) {
+            statusElement.textContent =
+              "1";
 
-        animateRace(
-          racers,
-          wallets,
-          winnerIndex,
-          finalPositions,
-          prize
-        );
-      }, 1000);
+            playBeep(
+              650
+            );
+
+            speak(
+              "One",
+              {
+                rate: 0.95,
+                pitch: 0.8
+              }
+            );
+
+            return;
+          }
+
+          clearInterval(
+            countdownTimer
+          );
+
+          statusElement.textContent =
+            "Racing";
+
+          cars.forEach(
+            car =>
+              car.classList.add(
+                "racing"
+              )
+          );
+
+          playBeep(
+            880,
+            0.28,
+            0.08
+          );
+
+          startEngineSound();
+
+          narrate(
+            "And they are off! Forty seconds now separate one wallet from victory."
+          );
+
+          animateRace(
+            cars,
+            wallets,
+            winnerIndex,
+            losingTargets
+          );
+        }, 1000);
     }
 
     function animateRace(
-      racers,
+      cars,
       wallets,
       winnerIndex,
-      finalPositions,
-      prize
+      losingTargets
     ) {
-      const raceDuration = 40000;
-      const startTime = performance.now();
+      const startTime =
+        performance.now();
 
       const narrationEvents = [
         {
-          time: 4500,
+          time: 5000,
+
           text:
             "The opening sprint is underway. There is no clear leader yet."
         },
+
         {
           time: 10500,
+
           text:
-            "The wallets are trading positions. This race is wide open."
+            "The wallets are trading positions. This race is completely open."
         },
+
         {
-          time: 17000,
+          time: 16500,
+
           text:
-            "One racer is moving forward, but the pack is closing fast."
+            "A new racer moves forward, but the pack is closing fast."
         },
+
         {
-          time: 24000,
+          time: 22000,
+
           text:
-            "The pressure is rising. Every wallet is still fighting."
+            "We are past the halfway mark. The engines are roaring and the pressure is rising."
         },
+
         {
-          time: 30000,
+          time: 28500,
+
           text:
-            "Ten seconds remaining. The finish line is getting closer."
+            "The finish line is getting closer, but nobody has secured the lead."
         },
+
         {
-          time: 35000,
+          time: 33000,
+
           text:
-            "Five seconds left. Nobody has secured the victory."
+            "Seven seconds remain. Every wallet is still fighting."
         },
+
         {
-          time: 37000,
+          time: 36000,
+
           text:
-            "Three seconds! Several wallets are almost side by side."
+            "Four seconds! The racers are almost side by side."
         },
+
+        {
+          time: 38000,
+
+          text:
+            "Two seconds left. This will come down to the final moment."
+        },
+
         {
           time: 39000,
+
           text:
             "One final second! Who will take the crown?"
         }
       ];
 
+      let lastRankingUpdate =
+        0;
+
       function frame(currentTime) {
-        const elapsed = Math.min(
-          currentTime - startTime,
-          raceDuration
-        );
-
-        const progress = elapsed / raceDuration;
-
-        const remainingSeconds = Math.max(
-          0,
-          Math.ceil(
-            (raceDuration - elapsed) / 1000
-          )
-        );
-
-        raceTimer.textContent =
-          "00:" +
-          String(remainingSeconds).padStart(2, "0");
-
-        if (remainingSeconds <= 10) {
-          raceTimer.classList.add("final-seconds");
-        } else {
-          raceTimer.classList.remove("final-seconds");
-        }
-
-        updateSuspenseSound(progress);
-
-        while (
-          narrationEventIndex <
-            narrationEvents.length &&
-          elapsed >=
-            narrationEvents[narrationEventIndex].time
-        ) {
-          narrate(
-            narrationEvents[narrationEventIndex].text
+        const elapsed =
+          Math.min(
+            currentTime -
+              startTime,
+            RACE_DURATION
           );
 
-          narrationEventIndex++;
+        const progress =
+          elapsed /
+          RACE_DURATION;
+
+        const remainingSeconds =
+          Math.max(
+            0,
+            Math.ceil(
+              (
+                RACE_DURATION -
+                elapsed
+              ) /
+              1000
+            )
+          );
+
+        timerElement.textContent =
+          `00:${
+            String(
+              remainingSeconds
+            ).padStart(
+              2,
+              "0"
+            )
+          }`;
+
+        timerElement.classList.toggle(
+          "danger",
+          remainingSeconds <= 10
+        );
+
+        updateEngineSound(
+          progress
+        );
+
+        while (
+          narrationIndex <
+            narrationEvents.length &&
+
+          elapsed >=
+            narrationEvents[
+              narrationIndex
+            ].time
+        ) {
+          narrate(
+            narrationEvents[
+              narrationIndex
+            ].text
+          );
+
+          narrationIndex++;
         }
 
-        racers.forEach((racer, index) => {
-          const trackWidth =
-            track.clientWidth -
-            racer.offsetWidth -
-            70;
+        const percentages =
+          cars.map(
+            (
+              car,
+              index
+            ) => {
+              const waveOne =
+                Math.sin(
+                  progress * 24 +
+                  index * 1.8
+                ) *
+                5.4 *
+                (
+                  1 -
+                  progress * 0.38
+                );
 
-          const mainMovement =
-            progress * 88;
+              const waveTwo =
+                Math.sin(
+                  progress * 57 +
+                  index * 0.91
+                ) *
+                2.1;
 
-          const positionWave =
-            Math.sin(
-              progress * 22 + index * 1.73
-            ) *
-            6 *
-            (1 - progress * 0.45);
+              const base =
+                progress * 88.5;
 
-          const speedVariation =
-            Math.sin(
-              progress * 67 + index * 0.91
-            ) * 2.2;
+              let percentage =
+                base +
+                waveOne +
+                waveTwo;
 
-          let percentage =
-            mainMovement +
-            positionWave +
-            speedVariation;
+              if (
+                progress > 0.67
+              ) {
+                percentage +=
+                  (
+                    progress -
+                    0.67
+                  ) *
+                  16;
+              }
 
-          if (progress > 0.72) {
-            percentage +=
-              (progress - 0.72) * 18;
-          }
+              if (
+                progress >= 0.92
+              ) {
+                const finalSprint =
+                  (
+                    progress -
+                    0.92
+                  ) /
+                  0.08;
 
-          /*
-            Final sprint begins during the last
-            2.4 seconds.
-          */
-          if (progress >= 0.94) {
-            const finalSprint =
-              (progress - 0.94) / 0.06;
+                const startPoint =
+                  89.8 +
+                  (
+                    index % 4
+                  ) *
+                  0.65;
 
-            const targetPosition =
-              index === winnerIndex
-                ? 99.75
-                : finalPositions[index];
+                const target =
+                  index ===
+                    winnerIndex
+                    ? 99.82
+                    : losingTargets[
+                        index
+                      ];
 
-            const sprintStart =
-              90 + (index % 3) * 0.6;
+                percentage =
+                  startPoint +
+                  finalSprint *
+                    (
+                      target -
+                      startPoint
+                    ) +
 
-            percentage =
-              sprintStart +
-              finalSprint *
-                (targetPosition - sprintStart) +
-              Math.sin(
-                progress * 90 + index
-              ) *
-                (1 - finalSprint) *
-                1.7;
-          }
+                  Math.sin(
+                    progress * 96 +
+                    index
+                  ) *
+                    (
+                      1 -
+                      finalSprint
+                    ) *
+                    1.4;
+              }
 
-          /*
-            Nobody crosses the finish line
-            before the full 40 seconds.
-          */
-          if (progress < 1) {
-            const positionLimit =
-              index === winnerIndex
-                ? 99.75
-                : Math.min(
-                    finalPositions[index],
-                    99.1
+              /*
+                Nobody can cross before
+                the full 40 seconds.
+              */
+
+              if (
+                progress < 1
+              ) {
+                const hardLimit =
+                  index ===
+                    winnerIndex
+                    ? 99.82
+                    : Math.min(
+                        losingTargets[
+                          index
+                        ],
+                        98.4
+                      );
+
+                percentage =
+                  Math.min(
+                    percentage,
+                    hardLimit
                   );
+              }
 
-            percentage = Math.min(
-              percentage,
-              positionLimit
-            );
+              /*
+                Losing wallets never cross.
+              */
+
+              if (
+                index !==
+                  winnerIndex
+              ) {
+                percentage =
+                  Math.min(
+                    percentage,
+                    losingTargets[
+                      index
+                    ]
+                  );
+              }
+
+              /*
+                Only the winner reaches
+                100% at exactly 40 seconds.
+              */
+
+              if (
+                progress >= 1
+              ) {
+                percentage =
+                  index ===
+                    winnerIndex
+                    ? 100
+                    : losingTargets[
+                        index
+                      ];
+              }
+
+              return Math.max(
+                0,
+                percentage
+              );
+            }
+          );
+
+        cars.forEach(
+          (
+            car,
+            index
+          ) => {
+            const usableWidth =
+              Math.max(
+                track.clientWidth -
+                  car.offsetWidth -
+                  82,
+                20
+              );
+
+            const position =
+              (
+                percentages[
+                  index
+                ] /
+                100
+              ) *
+              usableWidth;
+
+            car.style.transform =
+              `translateX(${position}px)`;
           }
+        );
 
-          /*
-            Losing wallets never cross.
-          */
-          if (index !== winnerIndex) {
-            percentage = Math.min(
-              percentage,
-              finalPositions[index]
-            );
-          }
+        if (
+          elapsed -
+            lastRankingUpdate >
+          250
+        ) {
+          updateRanking(
+            cars,
+            percentages
+          );
 
-          /*
-            Only at exactly 40 seconds does
-            the winner reach 100 percent.
-          */
-          if (progress >= 1) {
-            percentage =
-              index === winnerIndex
-                ? 100
-                : finalPositions[index];
-          }
+          lastRankingUpdate =
+            elapsed;
+        }
 
-          percentage = Math.max(0, percentage);
-
-          const position =
-            (percentage / 100) *
-            Math.max(trackWidth, 20);
-
-          racer.style.transform =
-            `translateX(${position}px)`;
-        });
-
-        if (progress < 1) {
-          requestAnimationFrame(frame);
+        if (
+          progress < 1
+        ) {
+          requestAnimationFrame(
+            frame
+          );
         } else {
-          raceTimer.textContent = "00:00";
+          timerElement.textContent =
+            "00:00";
 
           finishRace(
-            wallets[winnerIndex],
-            prize,
-            racers
+            wallets[
+              winnerIndex
+            ],
+            cars
           );
         }
       }
 
-      requestAnimationFrame(frame);
+      requestAnimationFrame(
+        frame
+      );
     }
 
-    function finishRace(wallet, prize, racers) {
-      racers.forEach(racer => {
-        racer.classList.remove("racing");
-      });
+    function finishRace(
+      wallet,
+      cars
+    ) {
+      cars.forEach(
+        car =>
+          car.classList.remove(
+            "racing"
+          )
+      );
 
-      stopSuspenseSound();
+      stopEngineSound();
 
-      statusElement.textContent = "WINNER";
-      raceTimer.textContent = "00:00";
-      raceTimer.classList.remove("final-seconds");
+      playCrowdOvation();
 
-      winnerWallet.textContent = wallet;
-      prizeText.textContent = `Prize: ${prize} SOL`;
+      playBeep(
+        1040,
+        0.5,
+        0.1
+      );
+
+      statusElement.textContent =
+        "Winner";
+
+      timerElement.textContent =
+        "00:00";
+
+      timerElement.classList.remove(
+        "danger"
+      );
+
+      winnerWallet.textContent =
+        wallet;
 
       narrate(
-        "We have a winner! The champion wallet has crossed the finish line."
+        "We have a winner! The champion wallet has crossed the finish line. Listen to the crowd!"
       );
 
       setTimeout(() => {
-        winnerModal.classList.add("show");
+        winnerModal.classList.add(
+          "show"
+        );
+
         launchConfetti();
-      }, 700);
+      }, 650);
     }
 
     function resetRace() {
-      winnerModal.classList.remove("show");
+      winnerModal.classList.remove(
+        "show"
+      );
 
       stopConfetti();
-      stopSuspenseSound();
 
-      if ("speechSynthesis" in window) {
+      stopEngineSound();
+
+      if (
+        "speechSynthesis"
+        in window
+      ) {
         window.speechSynthesis.cancel();
       }
 
-      raceRunning = false;
-      narrationEventIndex = 0;
+      raceRunning =
+        false;
 
-      startButton.disabled = false;
-      walletsInput.disabled = false;
-      prizeInput.disabled = false;
+      narrationIndex =
+        0;
 
-      statusElement.textContent = "WAITING";
-      raceTimer.textContent = "00:40";
-      raceTimer.classList.remove("final-seconds");
+      startButton.disabled =
+        false;
+
+      walletsInput.disabled =
+        false;
+
+      soundButton.disabled =
+        false;
+
+      voiceButton.disabled =
+        false;
+
+      statusElement.textContent =
+        "Waiting";
+
+      timerElement.textContent =
+        "00:40";
+
+      timerElement.classList.remove(
+        "danger"
+      );
 
       narratorText.textContent =
-        "Add the wallets and get ready for the race.";
+        "Add the eligible wallets and get ready for the race.";
 
       track.innerHTML = `
         <div class="finish-line"></div>
-        <div class="finish-label">Finish</div>
 
-        <div class="empty-state">
+        <div class="finish-label">
+          Finish
+        </div>
+
+        <div class="empty">
           <div>
             <span>🏁</span>
+
             Enter the wallets and press
             <strong>Start Race</strong>.
           </div>
         </div>
       `;
     }
+
+    soundButton.addEventListener(
+      "click",
+      () => {
+        soundEnabled =
+          !soundEnabled;
+
+        soundButton.textContent =
+          soundEnabled
+            ? "Sound On"
+            : "Sound Off";
+
+        soundButton.classList.toggle(
+          "off",
+          !soundEnabled
+        );
+
+        if (!soundEnabled) {
+          stopEngineSound();
+        } else {
+          prepareAudio();
+        }
+      }
+    );
+
+    voiceButton.addEventListener(
+      "click",
+      () => {
+        voiceEnabled =
+          !voiceEnabled;
+
+        voiceButton.textContent =
+          voiceEnabled
+            ? "Voice On"
+            : "Voice Off";
+
+        voiceButton.classList.toggle(
+          "off",
+          !voiceEnabled
+        );
+
+        if (
+          !voiceEnabled &&
+          "speechSynthesis"
+          in window
+        ) {
+          window.speechSynthesis.cancel();
+        }
+      }
+    );
+
+    xButton.addEventListener(
+      "click",
+      () =>
+        openProjectLink(
+          X_LINK,
+          "X"
+        )
+    );
+
+    caButton.addEventListener(
+      "click",
+      handleContractButton
+    );
+
+    buyButton.addEventListener(
+      "click",
+      () =>
+        openProjectLink(
+          BUY_LINK,
+          "Buy link"
+        )
+    );
+
+    walletsInput.addEventListener(
+      "input",
+      updateParticipants
+    );
 
     startButton.addEventListener(
       "click",
       startRace
     );
 
-    closeButton.addEventListener(
+    raceAgainButton.addEventListener(
       "click",
       resetRace
     );
-        if (progress < 1) {
-          requestAnimationFrame(frame);
-        } else {
-          finishRace(wallets[winnerIndex], prize, racers);
-        }
-      }
 
-      requestAnimationFrame(frame);
-    }
+    updateParticipants();
 
-    function finishRace(wallet, prize, racers) {
-      racers.forEach(racer => racer.classList.remove("racing"));
+    const canvas =
+      document.getElementById(
+        "confettiCanvas"
+      );
 
-      statusElement.textContent = "Finished";
-
-      winnerWallet.textContent = wallet;
-      prizeText.textContent = `Demo prize: ${prize} SOL`;
-
-      setTimeout(() => {
-        winnerModal.classList.add("show");
-        launchConfetti();
-      }, 600);
-    }
-
-    function resetRace() {
-      winnerModal.classList.remove("show");
-      stopConfetti();
-
-      raceRunning = false;
-      startButton.disabled = false;
-      walletsInput.disabled = false;
-      prizeInput.disabled = false;
-      statusElement.textContent = "Waiting";
-
-      track.innerHTML = `
-        <div class="finish-line"></div>
-        <div class="finish-label">Finish</div>
-
-        <div class="empty-state">
-          <div>
-            <span>🏁</span>
-            Enter the wallets and press
-            <strong>Start Race</strong>.
-          </div>
-        </div>
-      `;
-    }
-
-    startButton.addEventListener("click", startRace);
-    closeButton.addEventListener("click", resetRace);
-
-    const canvas = document.getElementById("confettiCanvas");
-    const context = canvas.getContext("2d");
+    const context =
+      canvas.getContext("2d");
 
     let particles = [];
-    let confettiAnimation = null;
+
+    let confettiAnimation =
+      null;
 
     function resizeCanvas() {
-      canvas.width = window.innerWidth;
-      canvas.height = window.innerHeight;
-    }
+      canvas.width =
+        window.innerWidth;
 
-    window.addEventListener("resize", resizeCanvas);
-    resizeCanvas();
+      canvas.height =
+        window.innerHeight;
+    }
 
     function launchConfetti() {
       const colors = [
-        "#adff00",
-        "#fff500",
-        "#14f195",
-        "#9945ff",
+        "#a8ff00",
+        "#f5ff00",
+        "#2cf4e8",
+        "#a259ff",
         "#ffffff"
       ];
 
-      particles = Array.from({ length: 240 }, () => ({
-        x: Math.random() * canvas.width,
-        y: Math.random() * -canvas.height,
-        width: randomBetween(5, 12),
-        height: randomBetween(8, 18),
-        speedY: randomBetween(2.5, 7),
-        speedX: randomBetween(-2.5, 2.5),
-        rotation: Math.random() * Math.PI,
-        rotationSpeed: randomBetween(-0.15, 0.15),
-        color: colors[secureRandomIndex(colors.length)]
-      }));
+      particles =
+        Array.from(
+          {
+            length: 280
+          },
+
+          () => ({
+            x:
+              Math.random() *
+              canvas.width,
+
+            y:
+              Math.random() *
+              -canvas.height,
+
+            width:
+              randomBetween(
+                5,
+                12
+              ),
+
+            height:
+              randomBetween(
+                8,
+                18
+              ),
+
+            speedY:
+              randomBetween(
+                2.6,
+                7.6
+              ),
+
+            speedX:
+              randomBetween(
+                -2.8,
+                2.8
+              ),
+
+            rotation:
+              Math.random() *
+              Math.PI,
+
+            rotationSpeed:
+              randomBetween(
+                -0.16,
+                0.16
+              ),
+
+            color:
+              colors[
+                secureRandomIndex(
+                  colors.length
+                )
+              ]
+          })
+        );
 
       animateConfetti();
     }
 
     function animateConfetti() {
-      context.clearRect(0, 0, canvas.width, canvas.height);
+      context.clearRect(
+        0,
+        0,
+        canvas.width,
+        canvas.height
+      );
 
-      particles.forEach(particle => {
-        particle.x += particle.speedX;
-        particle.y += particle.speedY;
-        particle.rotation += particle.rotationSpeed;
+      particles.forEach(
+        particle => {
+          particle.x +=
+            particle.speedX;
 
-        if (particle.y > canvas.height + 20) {
-          particle.y = -20;
-          particle.x = Math.random() * canvas.width;
+          particle.y +=
+            particle.speedY;
+
+          particle.rotation +=
+            particle.rotationSpeed;
+
+          if (
+            particle.y >
+            canvas.height + 25
+          ) {
+            particle.y =
+              -25;
+
+            particle.x =
+              Math.random() *
+              canvas.width;
+          }
+
+          context.save();
+
+          context.translate(
+            particle.x,
+            particle.y
+          );
+
+          context.rotate(
+            particle.rotation
+          );
+
+          context.fillStyle =
+            particle.color;
+
+          context.fillRect(
+            -particle.width / 2,
+            -particle.height / 2,
+            particle.width,
+            particle.height
+          );
+
+          context.restore();
         }
-
-        context.save();
-        context.translate(particle.x, particle.y);
-        context.rotate(particle.rotation);
-        context.fillStyle = particle.color;
-
-        context.fillRect(
-          -particle.width / 2,
-          -particle.height / 2,
-          particle.width,
-          particle.height
-        );
-
-        context.restore();
-      });
+      );
 
       confettiAnimation =
-        requestAnimationFrame(animateConfetti);
+        requestAnimationFrame(
+          animateConfetti
+        );
     }
 
     function stopConfetti() {
-      cancelAnimationFrame(confettiAnimation);
-      context.clearRect(0, 0, canvas.width, canvas.height);
-      particles = [];
-    }
-  </script>
+      if (confettiAnimation) {
+        cancelAnimationFrame(
+          confettiAnimation
+        );
+      }
 
+      confettiAnimation =
+        null;
+
+      particles =
+        [];
+
+      context.clearRect(
+        0,
+        0,
+        canvas.width,
+        canvas.height
+      );
+    }
+
+    window.addEventListener(
+      "resize",
+      resizeCanvas
+    );
+
+    resizeCanvas();
+  </script>
 </body>
 </html>
