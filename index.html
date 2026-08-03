@@ -2005,93 +2005,113 @@ Fo83Nq7oXLhczWRJrWQ2Cq6KAK2nVL65TCKfJxQUG8g</textarea>
       );
     }
 
-    function findEnglishVoice() {
-      const voices =
-        window.speechSynthesis
-          .getVoices();
+   function findEnglishVoice() {
+  const voices =
+    window.speechSynthesis.getVoices();
 
-      return (
-        voices.find(
-          voice =>
-            voice.lang
-              .toLowerCase()
-              .startsWith("en-us")
-        ) ||
+  const preferredVoices = [
+    "Microsoft Aria Online",
+    "Microsoft Jenny Online",
+    "Google US English",
+    "Samantha",
+    "Daniel",
+    "Alex"
+  ];
 
-        voices.find(
-          voice =>
-            voice.lang
-              .toLowerCase()
-              .startsWith("en-gb")
-        ) ||
-
-        voices.find(
-          voice =>
-            voice.lang
-              .toLowerCase()
-              .startsWith("en")
-        )
+  for (const preferredName of preferredVoices) {
+    const selectedVoice =
+      voices.find(voice =>
+        voice.name
+          .toLowerCase()
+          .includes(
+            preferredName.toLowerCase()
+          )
       );
+
+    if (selectedVoice) {
+      return selectedVoice;
+    }
+  }
+
+  return (
+    voices.find(voice =>
+      voice.lang
+        .toLowerCase()
+        .startsWith("en-us")
+    ) ||
+    voices.find(voice =>
+      voice.lang
+        .toLowerCase()
+        .startsWith("en-gb")
+    ) ||
+    voices.find(voice =>
+      voice.lang
+        .toLowerCase()
+        .startsWith("en")
+    )
+  );
+}
+
+   function speak(
+  text,
+  options = {}
+) {
+  if (
+    !voiceEnabled ||
+    !("speechSynthesis" in window)
+  ) {
+    return;
+  }
+
+  const speech =
+    window.speechSynthesis;
+
+  speech.cancel();
+  speech.resume();
+
+  const message =
+    new SpeechSynthesisUtterance(text);
+
+  message.lang = "en-US";
+  message.volume = 1;
+
+  message.rate =
+    options.rate ?? 1.06;
+
+  message.pitch =
+    options.pitch ?? 1.08;
+
+  const selectedVoice =
+    findEnglishVoice();
+
+  if (selectedVoice) {
+    message.voice = selectedVoice;
+  }
+
+  setTimeout(() => {
+    speech.speak(message);
+  }, 70);
+}
     }
 
-    function speak(
-      text,
-      options = {}
-    ) {
-      if (
-        !voiceEnabled ||
-        !(
-          "speechSynthesis"
-          in window
-        )
-      ) {
-        return;
-      }
+   function narrate(
+  text,
+  options = {}
+) {
+  narratorText.textContent = text;
 
-      window.speechSynthesis.cancel();
-
-      window.speechSynthesis.resume();
-
-      const message =
-        new SpeechSynthesisUtterance(
-          text
-        );
-
-      message.lang =
-        "en-US";
-
-      message.rate =
-        options.rate || 0.9;
-
-      message.pitch =
-        options.pitch || 0.72;
-
-      message.volume =
-        1;
-
-      const voice =
-        findEnglishVoice();
-
-      if (voice) {
-        message.voice = voice;
-      }
-
-      window.speechSynthesis.speak(
-        message
-      );
+  if (typeof options === "boolean") {
+    if (options) {
+      speak(text);
     }
 
-    function narrate(
-      text,
-      useVoice = true
-    ) {
-      narratorText.textContent =
-        text;
+    return;
+  }
 
-      if (useVoice) {
-        speak(text);
-      }
-    }
+  if (options.useVoice !== false) {
+    speak(text, options);
+  }
+}
 
     function createCars(wallets) {
       track.innerHTML = `
@@ -2423,7 +2443,7 @@ Fo83Nq7oXLhczWRJrWQ2Cq6KAK2nVL65TCKfJxQUG8g</textarea>
           startEngineSound();
 
           narrate(
-            "And they are off! Forty seconds now separate one wallet from victory."
+            "And they're off! Forty seconds of pure speed! Who will take home the rewards?"
           );
 
           animateRace(
@@ -2445,70 +2465,78 @@ Fo83Nq7oXLhczWRJrWQ2Cq6KAK2nVL65TCKfJxQUG8g</textarea>
         performance.now();
 
       const narrationEvents = [
-        {
-          time: 5000,
+  {
+    time: 4500,
+    text:
+      "What a launch! The engines are roaring and the wallets are flying!",
+    rate: 1.08,
+    pitch: 1.1
+  },
 
-          text:
-            "The opening sprint is underway. There is no clear leader yet."
-        },
+  {
+    time: 9500,
+    text:
+      "A new leader takes over! But look at the pack! This race is still wide open!",
+    rate: 1.07,
+    pitch: 1.11
+  },
 
-        {
-          time: 10500,
+  {
+    time: 15000,
+    text:
+      "They are wheel to wheel! Nobody is giving up an inch!",
+    rate: 1.09,
+    pitch: 1.12
+  },
 
-          text:
-            "The wallets are trading positions. This race is completely open."
-        },
+  {
+    time: 21000,
+    text:
+      "We are past the halfway mark! The crowd is on its feet and the rewards are still up for grabs!",
+    rate: 1.06,
+    pitch: 1.09
+  },
 
-        {
-          time: 16500,
+  {
+    time: 27500,
+    text:
+      "The finish line is getting closer! Who will be the winner and claim the rewards?",
+    rate: 1.07,
+    pitch: 1.11
+  },
 
-          text:
-            "A new racer moves forward, but the pack is closing fast."
-        },
+  {
+    time: 33000,
+    text:
+      "Seven seconds remain! This race is absolute chaos!",
+    rate: 1.11,
+    pitch: 1.13
+  },
 
-        {
-          time: 22000,
+  {
+    time: 36000,
+    text:
+      "Four seconds! They are almost side by side!",
+    rate: 1.13,
+    pitch: 1.15
+  },
 
-          text:
-            "We are past the halfway mark. The engines are roaring and the pressure is rising."
-        },
+  {
+    time: 38000,
+    text:
+      "Two seconds left! One final push!",
+    rate: 1.15,
+    pitch: 1.16
+  },
 
-        {
-          time: 28500,
-
-          text:
-            "The finish line is getting closer, but nobody has secured the lead."
-        },
-
-        {
-          time: 33000,
-
-          text:
-            "Seven seconds remain. Every wallet is still fighting."
-        },
-
-        {
-          time: 36000,
-
-          text:
-            "Four seconds! The racers are almost side by side."
-        },
-
-        {
-          time: 38000,
-
-          text:
-            "Two seconds left. This will come down to the final moment."
-        },
-
-        {
-          time: 39000,
-
-          text:
-            "One final second! Who will take the crown?"
-        }
-      ];
-
+  {
+    time: 39000,
+    text:
+      "Last second! Who will become the champion?",
+    rate: 1.16,
+    pitch: 1.18
+  }
+];
       let lastRankingUpdate =
         0;
 
@@ -2564,11 +2592,18 @@ Fo83Nq7oXLhczWRJrWQ2Cq6KAK2nVL65TCKfJxQUG8g</textarea>
               narrationIndex
             ].time
         ) {
-          narrate(
-            narrationEvents[
-              narrationIndex
-            ].text
-          );
+          const currentAnnouncement =
+  narrationEvents[narrationIndex];
+
+narrate(
+  currentAnnouncement.text,
+  {
+    rate:
+      currentAnnouncement.rate,
+    pitch:
+      currentAnnouncement.pitch
+  }
+);
 
           narrationIndex++;
         }
@@ -2827,7 +2862,7 @@ Fo83Nq7oXLhczWRJrWQ2Cq6KAK2nVL65TCKfJxQUG8g</textarea>
         wallet;
 
       narrate(
-        "We have a winner! The champion wallet has crossed the finish line. Listen to the crowd!"
+        "We have a winner! The champion wallet takes the glory and claims the rewards! What an incredible finish! Listen to that crowd!"
       );
 
       setTimeout(() => {
