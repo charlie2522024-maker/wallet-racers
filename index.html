@@ -8,16 +8,17 @@
 
   <style>
     :root {
-      --bg: #030503;
-      --panel: rgba(10, 16, 9, 0.96);
-      --panel-2: rgba(18, 28, 14, 0.95);
+      --bg: #020402;
+      --panel: rgba(8, 14, 7, 0.96);
+      --panel-2: rgba(18, 28, 14, 0.94);
       --green: #a8ff00;
       --yellow: #f5ff00;
-      --cyan: #2cf4e8;
+      --cyan: #20e9df;
+      --purple: #a259ff;
       --red: #ff3048;
       --text: #ffffff;
       --muted: #9aa596;
-      --border: rgba(168, 255, 0, 0.24);
+      --border: rgba(168, 255, 0, 0.25);
     }
 
     * {
@@ -37,7 +38,7 @@
       background:
         radial-gradient(
           circle at 50% -10%,
-          rgba(168, 255, 0, 0.18),
+          rgba(168, 255, 0, 0.17),
           transparent 35%
         ),
         linear-gradient(
@@ -81,7 +82,7 @@
       background:
         linear-gradient(
           180deg,
-          rgba(0, 0, 0, 0.1),
+          rgba(0, 0, 0, 0.08),
           rgba(0, 0, 0, 0.96)
         ),
         url("banner.png") center 36% / cover no-repeat;
@@ -95,9 +96,9 @@
       background:
         linear-gradient(
           90deg,
-          rgba(0, 0, 0, 0.88),
-          transparent 48%,
-          rgba(0, 0, 0, 0.32)
+          rgba(0, 0, 0, 0.9),
+          transparent 50%,
+          rgba(0, 0, 0, 0.28)
         );
     }
 
@@ -143,14 +144,14 @@
     }
 
     .nav-button {
-      min-width: 76px;
-      padding: 11px 14px;
+      min-width: 90px;
+      padding: 12px 16px;
       border: 1px solid rgba(168, 255, 0, 0.45);
       border-radius: 999px;
       cursor: pointer;
       color: var(--green);
       background: rgba(0, 0, 0, 0.72);
-      font-size: 11px;
+      font-size: 12px;
       font-weight: 1000;
       letter-spacing: 0.7px;
       text-transform: uppercase;
@@ -1214,11 +1215,11 @@
         Wallet <span>Racers</span>
       </h1>
 
-     <p>
-  Every wallet deserves a race. 🏎️<br>
-  Community memecoin built on Solana.<br>
-  Buy. Race. HODL. Win. $WRACE
-</p>
+      <p>
+        Every wallet deserves a race. 🏎️<br>
+        Community memecoin built on Solana.<br>
+        Buy. Race. HODL. Win. $WRACE
+      </p>
     </div>
   </header>
 
@@ -1236,6 +1237,7 @@
 
       <article class="stat">
         <small>Participants</small>
+
         <strong id="participantsStat">
           0 / 10
         </strong>
@@ -1301,7 +1303,7 @@ Fo83Nq7oXLhczWRJrWQ2Cq6KAK2nVL65TCKfJxQUG8g</textarea>
 
         <p class="note">
           Demo mode. This version uses manually entered
-          wallets and does not request private keys.
+          wallets and never asks for private keys.
         </p>
       </aside>
 
@@ -1357,7 +1359,9 @@ Fo83Nq7oXLhczWRJrWQ2Cq6KAK2nVL65TCKfJxQUG8g</textarea>
               <i></i>
             </div>
 
-            <strong>WRACE LIVE</strong>
+            <strong>
+              WRACE LIVE
+            </strong>
 
             <span id="narratorText">
               Add the eligible wallets and get ready
@@ -1433,14 +1437,11 @@ Fo83Nq7oXLhczWRJrWQ2Cq6KAK2nVL65TCKfJxQUG8g</textarea>
 
   <script>
     /*
-      WE WILL REPLACE THESE THREE VALUES AT THE END.
+      THESE THREE VALUES WILL BE ADDED LATER.
     */
 
     const X_LINK = "#";
-
-    const CONTRACT_ADDRESS =
-      "COMING SOON";
-
+    const CONTRACT_ADDRESS = "COMING SOON";
     const BUY_LINK = "#";
 
     const RACE_DURATION = 40000;
@@ -1502,6 +1503,7 @@ Fo83Nq7oXLhczWRJrWQ2Cq6KAK2nVL65TCKfJxQUG8g</textarea>
     let audioContext = null;
     let engineOscillatorOne = null;
     let engineOscillatorTwo = null;
+    let engineNoiseSource = null;
     let engineGain = null;
     let engineFilter = null;
 
@@ -1679,7 +1681,8 @@ Fo83Nq7oXLhczWRJrWQ2Cq6KAK2nVL65TCKfJxQUG8g</textarea>
       const now =
         audioContext.currentTime;
 
-      oscillator.type = "square";
+      oscillator.type =
+        "square";
 
       oscillator.frequency.value =
         frequency;
@@ -1707,6 +1710,37 @@ Fo83Nq7oXLhczWRJrWQ2Cq6KAK2nVL65TCKfJxQUG8g</textarea>
       );
     }
 
+    function createNoiseBuffer(
+      seconds = 2
+    ) {
+      const frameCount =
+        Math.floor(
+          audioContext.sampleRate *
+          seconds
+        );
+
+      const buffer =
+        audioContext.createBuffer(
+          1,
+          frameCount,
+          audioContext.sampleRate
+        );
+
+      const data =
+        buffer.getChannelData(0);
+
+      for (
+        let index = 0;
+        index < frameCount;
+        index++
+      ) {
+        data[index] =
+          Math.random() * 2 - 1;
+      }
+
+      return buffer;
+    }
+
     function startEngineSound() {
       if (
         !soundEnabled ||
@@ -1722,6 +1756,9 @@ Fo83Nq7oXLhczWRJrWQ2Cq6KAK2nVL65TCKfJxQUG8g</textarea>
       engineOscillatorTwo =
         audioContext.createOscillator();
 
+      engineNoiseSource =
+        audioContext.createBufferSource();
+
       engineGain =
         audioContext.createGain();
 
@@ -1735,19 +1772,25 @@ Fo83Nq7oXLhczWRJrWQ2Cq6KAK2nVL65TCKfJxQUG8g</textarea>
         "square";
 
       engineOscillatorOne.frequency.value =
-        58;
+        55;
 
       engineOscillatorTwo.frequency.value =
-        116;
+        110;
+
+      engineNoiseSource.buffer =
+        createNoiseBuffer(2);
+
+      engineNoiseSource.loop =
+        true;
 
       engineFilter.type =
         "lowpass";
 
       engineFilter.frequency.value =
-        650;
+        700;
 
       engineFilter.Q.value =
-        1.4;
+        1.5;
 
       engineGain.gain.value =
         0.012;
@@ -1760,6 +1803,10 @@ Fo83Nq7oXLhczWRJrWQ2Cq6KAK2nVL65TCKfJxQUG8g</textarea>
         engineFilter
       );
 
+      engineNoiseSource.connect(
+        engineFilter
+      );
+
       engineFilter.connect(
         engineGain
       );
@@ -1769,16 +1816,19 @@ Fo83Nq7oXLhczWRJrWQ2Cq6KAK2nVL65TCKfJxQUG8g</textarea>
       );
 
       engineOscillatorOne.start();
-
       engineOscillatorTwo.start();
+      engineNoiseSource.start();
     }
 
-    function updateEngineSound(progress) {
+    function updateEngineSound(
+      progress
+    ) {
       if (
         !audioContext ||
         !engineGain ||
         !engineOscillatorOne ||
-        !engineOscillatorTwo
+        !engineOscillatorTwo ||
+        !engineFilter
       ) {
         return;
       }
@@ -1788,13 +1838,13 @@ Fo83Nq7oXLhczWRJrWQ2Cq6KAK2nVL65TCKfJxQUG8g</textarea>
 
       const rpmWave =
         Math.sin(
-          progress * 90
+          progress * 95
         ) * 8;
 
       engineOscillatorOne.frequency
         .setTargetAtTime(
-          58 +
-          progress * 95 +
+          55 +
+          progress * 100 +
           rpmWave,
           now,
           0.08
@@ -1802,8 +1852,8 @@ Fo83Nq7oXLhczWRJrWQ2Cq6KAK2nVL65TCKfJxQUG8g</textarea>
 
       engineOscillatorTwo.frequency
         .setTargetAtTime(
-          116 +
-          progress * 185 +
+          110 +
+          progress * 195 +
           rpmWave * 2,
           now,
           0.08
@@ -1811,8 +1861,8 @@ Fo83Nq7oXLhczWRJrWQ2Cq6KAK2nVL65TCKfJxQUG8g</textarea>
 
       engineFilter.frequency
         .setTargetAtTime(
-          650 +
-          progress * 1350,
+          700 +
+          progress * 1450,
           now,
           0.12
         );
@@ -1820,7 +1870,7 @@ Fo83Nq7oXLhczWRJrWQ2Cq6KAK2nVL65TCKfJxQUG8g</textarea>
       engineGain.gain
         .setTargetAtTime(
           0.012 +
-          progress * 0.018,
+          progress * 0.02,
           now,
           0.1
         );
@@ -1833,26 +1883,31 @@ Fo83Nq7oXLhczWRJrWQ2Cq6KAK2nVL65TCKfJxQUG8g</textarea>
       ) {
         engineOscillatorOne = null;
         engineOscillatorTwo = null;
+        engineNoiseSource = null;
         engineGain = null;
         engineFilter = null;
 
         return;
       }
 
-      const now =
-        audioContext.currentTime;
-
-      const one =
+      const oscillatorOne =
         engineOscillatorOne;
 
-      const two =
+      const oscillatorTwo =
         engineOscillatorTwo;
+
+      const noiseSource =
+        engineNoiseSource;
 
       const gain =
         engineGain;
 
+      const now =
+        audioContext.currentTime;
+
       engineOscillatorOne = null;
       engineOscillatorTwo = null;
+      engineNoiseSource = null;
       engineGain = null;
       engineFilter = null;
 
@@ -1870,11 +1925,15 @@ Fo83Nq7oXLhczWRJrWQ2Cq6KAK2nVL65TCKfJxQUG8g</textarea>
           now + 0.35
         );
 
-        one.stop(
+        oscillatorOne.stop(
           now + 0.37
         );
 
-        two.stop(
+        oscillatorTwo.stop(
+          now + 0.37
+        );
+
+        noiseSource.stop(
           now + 0.37
         );
       } catch (error) {
@@ -1892,47 +1951,13 @@ Fo83Nq7oXLhczWRJrWQ2Cq6KAK2nVL65TCKfJxQUG8g</textarea>
         return;
       }
 
-      const duration = 3.6;
-
-      const sampleRate =
-        audioContext.sampleRate;
+      const duration =
+        4;
 
       const buffer =
-        audioContext.createBuffer(
-          1,
-          sampleRate * duration,
-          sampleRate
+        createNoiseBuffer(
+          duration
         );
-
-      const data =
-        buffer.getChannelData(0);
-
-      for (
-        let index = 0;
-        index < data.length;
-        index++
-      ) {
-        const time =
-          index / sampleRate;
-
-        const envelope =
-          Math.min(
-            1,
-            time * 3
-          ) *
-          Math.max(
-            0,
-            1 -
-            time / duration
-          );
-
-        data[index] =
-          (
-            Math.random() * 2 -
-            1
-          ) *
-          envelope;
-      }
 
       const source =
         audioContext.createBufferSource();
@@ -1943,19 +1968,20 @@ Fo83Nq7oXLhczWRJrWQ2Cq6KAK2nVL65TCKfJxQUG8g</textarea>
       const gain =
         audioContext.createGain();
 
-      source.buffer = buffer;
+      const now =
+        audioContext.currentTime;
+
+      source.buffer =
+        buffer;
 
       bandpass.type =
         "bandpass";
 
       bandpass.frequency.value =
-        1200;
+        1300;
 
       bandpass.Q.value =
-        0.55;
-
-      const now =
-        audioContext.currentTime;
+        0.5;
 
       gain.gain.setValueAtTime(
         0.0001,
@@ -1964,7 +1990,7 @@ Fo83Nq7oXLhczWRJrWQ2Cq6KAK2nVL65TCKfJxQUG8g</textarea>
 
       gain.gain.exponentialRampToValueAtTime(
         0.18,
-        now + 0.2
+        now + 0.18
       );
 
       gain.gain.exponentialRampToValueAtTime(
@@ -1987,131 +2013,157 @@ Fo83Nq7oXLhczWRJrWQ2Cq6KAK2nVL65TCKfJxQUG8g</textarea>
       source.start(now);
 
       [
-        0.25,
-        0.6,
-        1,
-        1.45,
-        2
+        0.2,
+        0.55,
+        0.95,
+        1.4,
+        1.9,
+        2.45
       ].forEach(
         (delay, index) => {
           setTimeout(() => {
             playBeep(
               720 + index * 55,
-              0.18,
-              0.035
+              0.16,
+              0.032
             );
           }, delay * 1000);
         }
       );
     }
 
-   function findEnglishVoice() {
-  const voices =
-    window.speechSynthesis.getVoices();
+    function findEnglishVoice() {
+      const voices =
+        window.speechSynthesis
+          .getVoices();
 
-  const preferredVoices = [
-    "Microsoft Aria Online",
-    "Microsoft Jenny Online",
-    "Google US English",
-    "Samantha",
-    "Daniel",
-    "Alex"
-  ];
+      const preferredNames = [
+        "Microsoft Aria",
+        "Microsoft Jenny",
+        "Google US English",
+        "Samantha",
+        "Daniel",
+        "Alex"
+      ];
 
-  for (const preferredName of preferredVoices) {
-    const selectedVoice =
-      voices.find(voice =>
-        voice.name
-          .toLowerCase()
-          .includes(
-            preferredName.toLowerCase()
-          )
+      for (
+        const preferredName
+        of preferredNames
+      ) {
+        const selectedVoice =
+          voices.find(voice =>
+            voice.name
+              .toLowerCase()
+              .includes(
+                preferredName
+                  .toLowerCase()
+              )
+          );
+
+        if (selectedVoice) {
+          return selectedVoice;
+        }
+      }
+
+      return (
+        voices.find(voice =>
+          voice.lang
+            .toLowerCase()
+            .startsWith("en-us")
+        ) ||
+
+        voices.find(voice =>
+          voice.lang
+            .toLowerCase()
+            .startsWith("en-gb")
+        ) ||
+
+        voices.find(voice =>
+          voice.lang
+            .toLowerCase()
+            .startsWith("en")
+        )
       );
-
-    if (selectedVoice) {
-      return selectedVoice;
-    }
-  }
-
-  return (
-    voices.find(voice =>
-      voice.lang
-        .toLowerCase()
-        .startsWith("en-us")
-    ) ||
-    voices.find(voice =>
-      voice.lang
-        .toLowerCase()
-        .startsWith("en-gb")
-    ) ||
-    voices.find(voice =>
-      voice.lang
-        .toLowerCase()
-        .startsWith("en")
-    )
-  );
-}
-
-   function speak(
-  text,
-  options = {}
-) {
-  if (
-    !voiceEnabled ||
-    !("speechSynthesis" in window)
-  ) {
-    return;
-  }
-
-  const speech =
-    window.speechSynthesis;
-
-  speech.cancel();
-  speech.resume();
-
-  const message =
-    new SpeechSynthesisUtterance(text);
-
-  message.lang = "en-US";
-  message.volume = 1;
-
-  message.rate =
-    options.rate ?? 1.06;
-
-  message.pitch =
-    options.pitch ?? 1.08;
-
-  const selectedVoice =
-    findEnglishVoice();
-
-  if (selectedVoice) {
-    message.voice = selectedVoice;
-  }
-
-  setTimeout(() => {
-    speech.speak(message);
-  }, 70);
-}
     }
 
-   function narrate(
-  text,
-  options = {}
-) {
-  narratorText.textContent = text;
+    function speak(
+      text,
+      options = {}
+    ) {
+      if (
+        !voiceEnabled ||
+        !(
+          "speechSynthesis"
+          in window
+        )
+      ) {
+        return;
+      }
 
-  if (typeof options === "boolean") {
-    if (options) {
-      speak(text);
+      const speech =
+        window.speechSynthesis;
+
+      speech.cancel();
+      speech.resume();
+
+      const message =
+        new SpeechSynthesisUtterance(
+          text
+        );
+
+      message.lang =
+        "en-US";
+
+      message.volume =
+        1;
+
+      message.rate =
+        options.rate ?? 1.06;
+
+      message.pitch =
+        options.pitch ?? 1.08;
+
+      const selectedVoice =
+        findEnglishVoice();
+
+      if (selectedVoice) {
+        message.voice =
+          selectedVoice;
+      }
+
+      setTimeout(() => {
+        speech.speak(message);
+      }, 60);
     }
 
-    return;
-  }
+    function narrate(
+      text,
+      options = {}
+    ) {
+      narratorText.textContent =
+        text;
 
-  if (options.useVoice !== false) {
-    speak(text, options);
-  }
-}
+      if (
+        typeof options ===
+        "boolean"
+      ) {
+        if (options) {
+          speak(text);
+        }
+
+        return;
+      }
+
+      if (
+        options.useVoice !==
+        false
+      ) {
+        speak(
+          text,
+          options
+        );
+      }
+    }
 
     function createCars(wallets) {
       track.innerHTML = `
@@ -2121,6 +2173,14 @@ Fo83Nq7oXLhczWRJrWQ2Cq6KAK2nVL65TCKfJxQUG8g</textarea>
           Finish
         </div>
       `;
+
+      track.style.minHeight =
+        `${
+          Math.max(
+            505,
+            wallets.length * 64 + 34
+          )
+        }px`;
 
       wallets.forEach(
         (wallet, index) => {
@@ -2288,7 +2348,9 @@ Fo83Nq7oXLhczWRJrWQ2Cq6KAK2nVL65TCKfJxQUG8g</textarea>
       const wallets =
         getWallets();
 
-      if (wallets.length < 2) {
+      if (
+        wallets.length < 2
+      ) {
         alert(
           "Add at least 2 eligible wallet addresses."
         );
@@ -2298,9 +2360,11 @@ Fo83Nq7oXLhczWRJrWQ2Cq6KAK2nVL65TCKfJxQUG8g</textarea>
 
       prepareAudio();
 
-      raceRunning = true;
+      raceRunning =
+        true;
 
-      narrationIndex = 0;
+      narrationIndex =
+        0;
 
       startButton.disabled =
         true;
@@ -2321,7 +2385,9 @@ Fo83Nq7oXLhczWRJrWQ2Cq6KAK2nVL65TCKfJxQUG8g</textarea>
         "danger"
       );
 
-      createCars(wallets);
+      createCars(
+        wallets
+      );
 
       const cars = [
         ...document
@@ -2373,8 +2439,8 @@ Fo83Nq7oXLhczWRJrWQ2Cq6KAK2nVL65TCKfJxQUG8g</textarea>
       speak(
         "Three",
         {
-          rate: 0.95,
-          pitch: 0.8
+          rate: 1,
+          pitch: 0.95
         }
       );
 
@@ -2382,7 +2448,9 @@ Fo83Nq7oXLhczWRJrWQ2Cq6KAK2nVL65TCKfJxQUG8g</textarea>
         setInterval(() => {
           countdown--;
 
-          if (countdown === 2) {
+          if (
+            countdown === 2
+          ) {
             statusElement.textContent =
               "2";
 
@@ -2393,15 +2461,17 @@ Fo83Nq7oXLhczWRJrWQ2Cq6KAK2nVL65TCKfJxQUG8g</textarea>
             speak(
               "Two",
               {
-                rate: 0.95,
-                pitch: 0.8
+                rate: 1,
+                pitch: 0.98
               }
             );
 
             return;
           }
 
-          if (countdown === 1) {
+          if (
+            countdown === 1
+          ) {
             statusElement.textContent =
               "1";
 
@@ -2412,8 +2482,8 @@ Fo83Nq7oXLhczWRJrWQ2Cq6KAK2nVL65TCKfJxQUG8g</textarea>
             speak(
               "One",
               {
-                rate: 0.95,
-                pitch: 0.8
+                rate: 1,
+                pitch: 1
               }
             );
 
@@ -2428,10 +2498,11 @@ Fo83Nq7oXLhczWRJrWQ2Cq6KAK2nVL65TCKfJxQUG8g</textarea>
             "Racing";
 
           cars.forEach(
-            car =>
+            car => {
               car.classList.add(
                 "racing"
-              )
+              );
+            }
           );
 
           playBeep(
@@ -2443,7 +2514,11 @@ Fo83Nq7oXLhczWRJrWQ2Cq6KAK2nVL65TCKfJxQUG8g</textarea>
           startEngineSound();
 
           narrate(
-            "And they're off! Forty seconds of pure speed! Who will take home the rewards?"
+            "And they're off! Forty seconds of pure speed! Who will take home the rewards?",
+            {
+              rate: 1.08,
+              pitch: 1.1
+            }
           );
 
           animateRace(
@@ -2465,82 +2540,103 @@ Fo83Nq7oXLhczWRJrWQ2Cq6KAK2nVL65TCKfJxQUG8g</textarea>
         performance.now();
 
       const narrationEvents = [
-  {
-    time: 4500,
-    text:
-      "What a launch! The engines are roaring and the wallets are flying!",
-    rate: 1.08,
-    pitch: 1.1
-  },
+        {
+          time: 4500,
 
-  {
-    time: 9500,
-    text:
-      "A new leader takes over! But look at the pack! This race is still wide open!",
-    rate: 1.07,
-    pitch: 1.11
-  },
+          text:
+            "What a launch! The engines are roaring and the wallets are flying!",
 
-  {
-    time: 15000,
-    text:
-      "They are wheel to wheel! Nobody is giving up an inch!",
-    rate: 1.09,
-    pitch: 1.12
-  },
+          rate: 1.08,
+          pitch: 1.1
+        },
 
-  {
-    time: 21000,
-    text:
-      "We are past the halfway mark! The crowd is on its feet and the rewards are still up for grabs!",
-    rate: 1.06,
-    pitch: 1.09
-  },
+        {
+          time: 9500,
 
-  {
-    time: 27500,
-    text:
-      "The finish line is getting closer! Who will be the winner and claim the rewards?",
-    rate: 1.07,
-    pitch: 1.11
-  },
+          text:
+            "A new leader takes over! But look at the pack! This race is still wide open!",
 
-  {
-    time: 33000,
-    text:
-      "Seven seconds remain! This race is absolute chaos!",
-    rate: 1.11,
-    pitch: 1.13
-  },
+          rate: 1.07,
+          pitch: 1.11
+        },
 
-  {
-    time: 36000,
-    text:
-      "Four seconds! They are almost side by side!",
-    rate: 1.13,
-    pitch: 1.15
-  },
+        {
+          time: 15000,
 
-  {
-    time: 38000,
-    text:
-      "Two seconds left! One final push!",
-    rate: 1.15,
-    pitch: 1.16
-  },
+          text:
+            "They are wheel to wheel! Nobody is giving up an inch!",
 
-  {
-    time: 39000,
-    text:
-      "Last second! Who will become the champion?",
-    rate: 1.16,
-    pitch: 1.18
-  }
-];
+          rate: 1.09,
+          pitch: 1.12
+        },
+
+        {
+          time: 21000,
+
+          text:
+            "We are past the halfway mark! The crowd is on its feet and the rewards are still up for grabs!",
+
+          rate: 1.06,
+          pitch: 1.09
+        },
+
+        {
+          time: 27500,
+
+          text:
+            "The finish line is getting closer! Who will be the winner and claim the rewards?",
+
+          rate: 1.07,
+          pitch: 1.11
+        },
+
+        {
+          time: 33000,
+
+          text:
+            "Seven seconds remain! This race is absolute chaos!",
+
+          rate: 1.11,
+          pitch: 1.13
+        },
+
+        {
+          time: 36000,
+
+          text:
+            "Four seconds! They are almost side by side!",
+
+          rate: 1.13,
+          pitch: 1.15
+        },
+
+        {
+          time: 38000,
+
+          text:
+            "Two seconds left! One final push!",
+
+          rate: 1.15,
+          pitch: 1.16
+        },
+
+        {
+          time: 39000,
+
+          text:
+            "Last second! Who will become the champion?",
+
+          rate: 1.16,
+          pitch: 1.18
+        }
+      ];
+
       let lastRankingUpdate =
         0;
 
-      function frame(currentTime) {
+      function frame(
+        currentTime
+      ) {
         const elapsed =
           Math.min(
             currentTime -
@@ -2593,17 +2689,20 @@ Fo83Nq7oXLhczWRJrWQ2Cq6KAK2nVL65TCKfJxQUG8g</textarea>
             ].time
         ) {
           const currentAnnouncement =
-  narrationEvents[narrationIndex];
+            narrationEvents[
+              narrationIndex
+            ];
 
-narrate(
-  currentAnnouncement.text,
-  {
-    rate:
-      currentAnnouncement.rate,
-    pitch:
-      currentAnnouncement.pitch
-  }
-);
+          narrate(
+            currentAnnouncement.text,
+            {
+              rate:
+                currentAnnouncement.rate,
+
+              pitch:
+                currentAnnouncement.pitch
+            }
+          );
 
           narrationIndex++;
         }
@@ -2678,6 +2777,7 @@ narrate(
 
                 percentage =
                   startPoint +
+
                   finalSprint *
                     (
                       target -
@@ -2696,8 +2796,8 @@ narrate(
               }
 
               /*
-                Nobody can cross before
-                the full 40 seconds.
+                Nobody reaches the finish
+                line before 40 seconds.
               */
 
               if (
@@ -2832,10 +2932,11 @@ narrate(
       cars
     ) {
       cars.forEach(
-        car =>
+        car => {
           car.classList.remove(
             "racing"
-          )
+          );
+        }
       );
 
       stopEngineSound();
@@ -2862,7 +2963,11 @@ narrate(
         wallet;
 
       narrate(
-        "We have a winner! The champion wallet takes the glory and claims the rewards! What an incredible finish! Listen to that crowd!"
+        "We have a winner! The champion wallet takes the glory and claims the rewards! What an incredible finish! Listen to that crowd!",
+        {
+          rate: 1.08,
+          pitch: 1.13
+        }
       );
 
       setTimeout(() => {
@@ -2920,6 +3025,9 @@ narrate(
 
       narratorText.textContent =
         "Add the eligible wallets and get ready for the race.";
+
+      track.style.minHeight =
+        "505px";
 
       track.innerHTML = `
         <div class="finish-line"></div>
@@ -3054,7 +3162,7 @@ narrate(
       const colors = [
         "#a8ff00",
         "#f5ff00",
-        "#2cf4e8",
+        "#20e9df",
         "#a259ff",
         "#ffffff"
       ];
