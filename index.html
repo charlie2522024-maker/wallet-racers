@@ -673,58 +673,28 @@ Fo83Nq7oXLhczWRJrWQ2Cq6KAK2nVL65TCKfJxQUG8g</textarea>
         </div>
 
         <div id="track" class="track">
-          <div class="finish-line"></div>
-          <div class="finish-label">Finish</div>
-
-          <div class="empty-state">
-            <div>
-              <span>🏁</span>
-              Enter the wallets and press <strong>Start Race</strong>.
-            </div>
-          </div>
-        </div>
-      </section>
-
-    </section>
-  </main>
-
-  <div id="winnerModal" class="winner-modal">
-    <div class="winner-card">
-      <div class="trophy">🏆</div>
-
-      <h2>Winner!</h2>
-
-      <p>The fastest wallet is:</p>
-
-      <div id="winnerWallet" class="winner-wallet"></div>
-
-      <div id="prizeText" class="prize-text"></div>
-
-      <button id="closeButton" class="close-button">
-        Race Again
-      </button>
-    </div>
-  </div>
-
-  <footer>
-    <strong>Wallet Racers</strong> · Buy. Race. HODL. Win.
-  </footer>
-
-  <script>
-    const walletsInput = document.getElementById("wallets");
+             const walletsInput = document.getElementById("wallets");
     const prizeInput = document.getElementById("prize");
     const startButton = document.getElementById("startButton");
     const track = document.getElementById("track");
     const statusElement = document.getElementById("status");
+    const raceTimer = document.getElementById("raceTimer");
+    const narratorText = document.getElementById("narratorText");
     const winnerModal = document.getElementById("winnerModal");
     const winnerWallet = document.getElementById("winnerWallet");
     const prizeText = document.getElementById("prizeText");
     const closeButton = document.getElementById("closeButton");
 
     let raceRunning = false;
+    let narrationEventIndex = 0;
+
+    let audioContext = null;
+    let suspenseOscillator = null;
+    let suspenseGain = null;
 
     function shortWallet(wallet) {
       if (wallet.length <= 13) return wallet;
+
       return wallet.slice(0, 6) + "..." + wallet.slice(-5);
     }
 
@@ -755,9 +725,145 @@ Fo83Nq7oXLhczWRJrWQ2Cq6KAK2nVL65TCKfJxQUG8g</textarea>
 
     function randomBetween(min, max) {
       const randomArray = new Uint32Array(1);
+
       crypto.getRandomValues(randomArray);
 
-      return min + (randomArray[0] / 0xffffffff) * (max - min);
+      return min +
+        (randomArray[0] / 0xffffffff) *
+        (max - min);
+    }
+
+    function prepareAudio() {
+      const AudioContextClass =
+        window.AudioContext ||
+        window.webkitAudioContext;
+
+      if (!AudioContextClass) return;
+
+      if (!audioContext) {
+        audioContext = new AudioContextClass();
+      }
+
+      if (audioContext.state === "suspended") {
+        audioContext.resume();
+      }
+    }
+
+    function startSuspenseSound() {
+      if (!audioContext || suspenseOscillator) return;
+
+      suspenseOscillator =
+        audioContext.createOscillator();
+
+      suspenseGain =
+        audioContext.createGain();
+
+      suspenseOscillator.type = "sawtooth";
+      suspenseOscillator.frequency.value = 48;
+      suspenseGain.gain.value = 0.012;
+
+      suspenseOscillator.connect(suspenseGain);
+      suspenseGain.connect(audioContext.destination);
+
+      suspenseOscillator.start();
+    }
+
+    function updateSuspenseSound(progress) {
+      if (
+        !audioContext ||
+        !suspenseOscillator ||
+        !suspenseGain
+      ) {
+        return;
+      }
+
+      const currentTime = audioContext.currentTime;
+
+      suspenseOscillator.frequency.setTargetAtTime(
+        48 + progress * 46,
+        currentTime,
+        0.12
+      );
+
+      suspenseGain.gain.setTargetAtTime(
+        0.012 + progress * 0.012,
+        currentTime,
+        0.15
+      );
+    }
+
+    function stopSuspenseSound() {
+      if (
+        !audioContext ||
+        !suspenseOscillator ||
+        !suspenseGain
+      ) {
+        return;
+      }
+
+      const currentTime = audioContext.currentTime;
+
+      try {
+        suspenseGain.gain.setValueAtTime(
+          suspenseGain.gain.value,
+          currentTime
+        );
+
+        suspenseGain.gain.exponentialRampToValueAtTime(
+          0.0001,
+          currentTime + 0.3
+        );
+
+        suspenseOscillator.stop(currentTime + 0.32);
+      } catch (error) {
+        console.log("Audio already stopped.");
+      }
+
+      suspenseOscillator = null;
+      suspenseGain = null;
+    }
+
+    function speak(text) {
+      if (!("speechSynthesis" in window)) return;
+
+      window.speechSynthesis.cancel();
+      window.speechSynthesis.resume();
+
+      const message =
+        new SpeechSynthesisUtterance(text);
+
+      message.lang = "en-US";
+      message.rate = 0.88;
+      message.pitch = 0.72;
+      message.volume = 1;
+
+      const voices =
+        window.speechSynthesis.getVoices();
+
+      const englishVoice =
+        voices.find(voice =>
+          voice.lang.toLowerCase().startsWith("en-us")
+        ) ||
+        voices.find(voice =>
+          voice.lang.toLowerCase().startsWith("en-gb")
+        ) ||
+        voices.find(voice =>
+          voice.lang.toLowerCase().startsWith("en")
+        );
+
+      if (englishVoice) {
+        message.voice = englishVoice;
+      }
+
+      window.speechSynthesis.speak(message);
+    }
+
+    function narrate(text, useVoice = true) {
+      narratorText.textContent = text;
+
+      if (useVoice) {
+        speak(text);
+      }
     }
 
     function createRacers(wallets) {
@@ -768,6 +874,7 @@ Fo83Nq7oXLhczWRJrWQ2Cq6KAK2nVL65TCKfJxQUG8g</textarea>
 
       wallets.forEach((wallet, index) => {
         const lane = document.createElement("div");
+
         lane.className = "lane";
 
         lane.innerHTML = `
@@ -780,17 +887,15 @@ Fo83Nq7oXLhczWRJrWQ2Cq6KAK2nVL65TCKfJxQUG8g</textarea>
 
             <div class="wallet-name">
               <strong>${shortWallet(wallet)}</strong>
-              <small>RACER ${String(index + 1).padStart(2, "0")}</small>
+              <small>
+                RACER ${String(index + 1).padStart(2, "0")}
+              </small>
             </div>
           </div>
         `;
 
         track.appendChild(lane);
       });
-    }
-
-    function easeOutCubic(value) {
-      return 1 - Math.pow(1 - value, 3);
     }
 
     function startRace() {
@@ -810,36 +915,75 @@ Fo83Nq7oXLhczWRJrWQ2Cq6KAK2nVL65TCKfJxQUG8g</textarea>
         return;
       }
 
+      prepareAudio();
+
       raceRunning = true;
+      narrationEventIndex = 0;
+
       startButton.disabled = true;
       walletsInput.disabled = true;
       prizeInput.disabled = true;
 
+      raceTimer.textContent = "00:40";
+      raceTimer.classList.remove("final-seconds");
+
       createRacers(wallets);
 
-      const racers = [...document.querySelectorAll(".racer")];
-      const winnerIndex = secureRandomIndex(wallets.length);
+      const racers = [
+        ...document.querySelectorAll(".racer")
+      ];
 
-      const finalPositions = racers.map((_, index) => {
-        return index === winnerIndex
-          ? 100
-          : randomBetween(72, 94);
-      });
+      const winnerIndex =
+        secureRandomIndex(wallets.length);
 
-      statusElement.textContent = "Get Ready";
+      const finalPositions = racers.map(
+        (_, index) => {
+          if (index === winnerIndex) {
+            return 100;
+          }
+
+          return randomBetween(92, 97);
+        }
+      );
+
+      narrate(
+        "Racers locked in. The countdown has begun.",
+        false
+      );
 
       let countdown = 3;
 
+      statusElement.textContent = "3";
+      speak("Three");
+
       const countdownTimer = setInterval(() => {
-        if (countdown > 0) {
-          statusElement.textContent = countdown;
-          countdown--;
+        countdown--;
+
+        if (countdown === 2) {
+          statusElement.textContent = "2";
+          speak("Two");
+          return;
+        }
+
+        if (countdown === 1) {
+          statusElement.textContent = "1";
+          speak("One");
           return;
         }
 
         clearInterval(countdownTimer);
-        statusElement.textContent = "Racing";
-        racers.forEach(racer => racer.classList.add("racing"));
+
+        statusElement.textContent = "RACING";
+
+        racers.forEach(racer => {
+          racer.classList.add("racing");
+        });
+
+        startSuspenseSound();
+
+        narrate(
+          "And they are off! Forty seconds now separate one wallet from victory."
+        );
 
         animateRace(
           racers,
@@ -848,7 +992,7 @@ Fo83Nq7oXLhczWRJrWQ2Cq6KAK2nVL65TCKfJxQUG8g</textarea>
           finalPositions,
           prize
         );
-      }, 700);
+      }, 1000);
     }
 
     function animateRace(
@@ -858,13 +1002,91 @@ Fo83Nq7oXLhczWRJrWQ2Cq6KAK2nVL65TCKfJxQUG8g</textarea>
       finalPositions,
       prize
     ) {
-      const raceDuration = 8500;
+      const raceDuration = 40000;
       const startTime = performance.now();
 
+      const narrationEvents = [
+        {
+          time: 4500,
+          text:
+            "The opening sprint is underway. There is no clear leader yet."
+        },
+        {
+          time: 10500,
+          text:
+            "The wallets are trading positions. This race is wide open."
+        },
+        {
+          time: 17000,
+          text:
+            "One racer is moving forward, but the pack is closing fast."
+        },
+        {
+          time: 24000,
+          text:
+            "The pressure is rising. Every wallet is still fighting."
+        },
+        {
+          time: 30000,
+          text:
+            "Ten seconds remaining. The finish line is getting closer."
+        },
+        {
+          time: 35000,
+          text:
+            "Five seconds left. Nobody has secured the victory."
+        },
+        {
+          time: 37000,
+          text:
+            "Three seconds! Several wallets are almost side by side."
+        },
+        {
+          time: 39000,
+          text:
+            "One final second! Who will take the crown?"
+        }
+      ];
+
       function frame(currentTime) {
-        const elapsed = currentTime - startTime;
-        const progress = Math.min(elapsed / raceDuration, 1);
-        const easedProgress = easeOutCubic(progress);
+        const elapsed = Math.min(
+          currentTime - startTime,
+          raceDuration
+        );
+
+        const progress = elapsed / raceDuration;
+
+        const remainingSeconds = Math.max(
+          0,
+          Math.ceil(
+            (raceDuration - elapsed) / 1000
+          )
+        );
+
+        raceTimer.textContent =
+          "00:" +
+          String(remainingSeconds).padStart(2, "0");
+
+        if (remainingSeconds <= 10) {
+          raceTimer.classList.add("final-seconds");
+        } else {
+          raceTimer.classList.remove("final-seconds");
+        }
+
+        updateSuspenseSound(progress);
+
+        while (
+          narrationEventIndex <
+            narrationEvents.length &&
+          elapsed >=
+            narrationEvents[narrationEventIndex].time
+        ) {
+          narrate(
+            narrationEvents[narrationEventIndex].text
+          );
+
+          narrationEventIndex++;
+        }
 
         racers.forEach((racer, index) => {
           const trackWidth =
@@ -872,16 +1094,80 @@ Fo83Nq7oXLhczWRJrWQ2Cq6KAK2nVL65TCKfJxQUG8g</textarea>
             racer.offsetWidth -
             70;
 
-          const wave =
-            Math.sin(progress * 18 + index * 1.7) *
-            (1 - progress) *
-            5;
+          const mainMovement =
+            progress * 88;
+
+          const positionWave =
+            Math.sin(
+              progress * 22 + index * 1.73
+            ) *
+            6 *
+            (1 - progress * 0.45);
+
+          const speedVariation =
+            Math.sin(
+              progress * 67 + index * 0.91
+            ) * 2.2;
 
           let percentage =
-            easedProgress * finalPositions[index] + wave;
+            mainMovement +
+            positionWave +
+            speedVariation;
 
-          percentage = Math.max(0, percentage);
+          if (progress > 0.72) {
+            percentage +=
+              (progress - 0.72) * 18;
+          }
 
+          /*
+            Final sprint begins during the last
+            2.4 seconds.
+          */
+          if (progress >= 0.94) {
+            const finalSprint =
+              (progress - 0.94) / 0.06;
+
+            const targetPosition =
+              index === winnerIndex
+                ? 99.75
+                : finalPositions[index];
+
+            const sprintStart =
+              90 + (index % 3) * 0.6;
+
+            percentage =
+              sprintStart +
+              finalSprint *
+                (targetPosition - sprintStart) +
+              Math.sin(
+                progress * 90 + index
+              ) *
+                (1 - finalSprint) *
+                1.7;
+          }
+
+          /*
+            Nobody crosses the finish line
+            before the full 40 seconds.
+          */
+          if (progress < 1) {
+            const positionLimit =
+              index === winnerIndex
+                ? 99.75
+                : Math.min(
+                    finalPositions[index],
+                    99.1
+                  );
+
+            percentage = Math.min(
+              percentage,
+              positionLimit
+            );
+          }
+
+          /*
+            Losing wallets never cross.
+          */
           if (index !== winnerIndex) {
             percentage = Math.min(
               percentage,
@@ -889,17 +1175,114 @@ Fo83Nq7oXLhczWRJrWQ2Cq6KAK2nVL65TCKfJxQUG8g</textarea>
             );
           }
 
-          if (progress === 1 && index === winnerIndex) {
-            percentage = 100;
+          /*
+            Only at exactly 40 seconds does
+            the winner reach 100 percent.
+          */
+          if (progress >= 1) {
+            percentage =
+              index === winnerIndex
+                ? 100
+                : finalPositions[index];
           }
 
+          percentage = Math.max(0, percentage);
+
           const position =
-            (percentage / 100) * Math.max(trackWidth, 20);
+            (percentage / 100) *
+            Math.max(trackWidth, 20);
 
           racer.style.transform =
             `translateX(${position}px)`;
         });
 
+        if (progress < 1) {
+          requestAnimationFrame(frame);
+        } else {
+          raceTimer.textContent = "00:00";
+
+          finishRace(
+            wallets[winnerIndex],
+            prize,
+            racers
+          );
+        }
+      }
+
+      requestAnimationFrame(frame);
+    }
+
+    function finishRace(wallet, prize, racers) {
+      racers.forEach(racer => {
+        racer.classList.remove("racing");
+      });
+
+      stopSuspenseSound();
+
+      statusElement.textContent = "WINNER";
+      raceTimer.textContent = "00:00";
+      raceTimer.classList.remove("final-seconds");
+
+      winnerWallet.textContent = wallet;
+      prizeText.textContent = `Prize: ${prize} SOL`;
+
+      narrate(
+        "We have a winner! The champion wallet has crossed the finish line."
+      );
+
+      setTimeout(() => {
+        winnerModal.classList.add("show");
+        launchConfetti();
+      }, 700);
+    }
+
+    function resetRace() {
+      winnerModal.classList.remove("show");
+
+      stopConfetti();
+      stopSuspenseSound();
+
+      if ("speechSynthesis" in window) {
+        window.speechSynthesis.cancel();
+      }
+
+      raceRunning = false;
+      narrationEventIndex = 0;
+
+      startButton.disabled = false;
+      walletsInput.disabled = false;
+      prizeInput.disabled = false;
+
+      statusElement.textContent = "WAITING";
+      raceTimer.textContent = "00:40";
+      raceTimer.classList.remove("final-seconds");
+
+      narratorText.textContent =
+        "Add the wallets and get ready for the race.";
+
+      track.innerHTML = `
+        <div class="finish-line"></div>
+        <div class="finish-label">Finish</div>
+
+        <div class="empty-state">
+          <div>
+            <span>🏁</span>
+            Enter the wallets and press
+            <strong>Start Race</strong>.
+          </div>
+        </div>
+      `;
+    }
+
+    startButton.addEventListener(
+      "click",
+      startRace
+    );
+
+    closeButton.addEventListener(
+      "click",
+      resetRace
+    );
         if (progress < 1) {
           requestAnimationFrame(frame);
         } else {
