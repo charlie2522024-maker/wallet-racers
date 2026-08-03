@@ -1,0 +1,1032 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+  <title>Wallet Racers | Solana Racing</title>
+
+  <style>
+    :root {
+      --green: #adff00;
+      --yellow: #fff500;
+      --black: #050705;
+      --panel: #101510;
+      --border: #33451f;
+      --text: #ffffff;
+      --muted: #9da79d;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      min-height: 100vh;
+      overflow-x: hidden;
+      color: var(--text);
+      background:
+        radial-gradient(circle at top, #173200 0%, #050705 38%, #000 100%);
+      font-family: Arial, Helvetica, sans-serif;
+    }
+
+    button,
+    input,
+    textarea {
+      font: inherit;
+    }
+
+    .hero {
+      position: relative;
+      width: 100%;
+      min-height: 320px;
+      display: flex;
+      align-items: flex-end;
+      justify-content: center;
+      overflow: hidden;
+      border-bottom: 2px solid var(--green);
+      background:
+        linear-gradient(to bottom, transparent 45%, rgba(0, 0, 0, 0.9)),
+        url("banner.png") center/cover no-repeat;
+    }
+
+    .hero::after {
+      content: "";
+      position: absolute;
+      inset: 0;
+      pointer-events: none;
+      background: linear-gradient(
+        90deg,
+        rgba(0, 0, 0, 0.65),
+        transparent 45%,
+        rgba(0, 0, 0, 0.25)
+      );
+    }
+
+    .navbar {
+      position: absolute;
+      z-index: 4;
+      top: 0;
+      left: 0;
+      width: 100%;
+      padding: 18px 5%;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      background: linear-gradient(to bottom, rgba(0, 0, 0, 0.9), transparent);
+    }
+
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      font-size: 24px;
+      font-weight: 900;
+      letter-spacing: 1px;
+      color: white;
+      text-transform: uppercase;
+    }
+
+    .brand-logo {
+      width: 54px;
+      height: 54px;
+      border-radius: 50%;
+      object-fit: cover;
+      border: 2px solid var(--green);
+      box-shadow: 0 0 20px rgba(173, 255, 0, 0.55);
+    }
+
+    .nav-badge {
+      border: 1px solid var(--green);
+      border-radius: 999px;
+      padding: 10px 18px;
+      color: var(--green);
+      font-weight: 800;
+      background: rgba(0, 0, 0, 0.7);
+    }
+
+    .hero-content {
+      position: relative;
+      z-index: 3;
+      width: 100%;
+      padding: 130px 6% 42px;
+      text-align: center;
+    }
+
+    .hero-content h1 {
+      font-size: clamp(42px, 8vw, 92px);
+      font-weight: 1000;
+      font-style: italic;
+      line-height: 0.9;
+      text-transform: uppercase;
+      text-shadow:
+        0 4px 0 #3d5500,
+        0 0 28px rgba(173, 255, 0, 0.55);
+    }
+
+    .hero-content h1 span {
+      color: var(--yellow);
+    }
+
+    .hero-content p {
+      margin-top: 18px;
+      color: #e3e9df;
+      font-size: clamp(16px, 2vw, 22px);
+      font-weight: 700;
+    }
+
+    .container {
+      width: min(1200px, 94%);
+      margin: 35px auto 70px;
+    }
+
+    .dashboard {
+      display: grid;
+      grid-template-columns: 340px 1fr;
+      gap: 24px;
+      align-items: start;
+    }
+
+    .panel {
+      padding: 24px;
+      border: 1px solid var(--border);
+      border-radius: 22px;
+      background: linear-gradient(145deg, rgba(18, 25, 15, 0.97), rgba(5, 8, 5, 0.97));
+      box-shadow:
+        0 20px 50px rgba(0, 0, 0, 0.45),
+        inset 0 0 25px rgba(173, 255, 0, 0.025);
+    }
+
+    .panel h2 {
+      margin-bottom: 8px;
+      font-size: 24px;
+      text-transform: uppercase;
+    }
+
+    .panel-description {
+      margin-bottom: 20px;
+      color: var(--muted);
+      font-size: 14px;
+      line-height: 1.5;
+    }
+
+    label {
+      display: block;
+      margin: 16px 0 8px;
+      color: #d8dfd4;
+      font-size: 13px;
+      font-weight: 800;
+      letter-spacing: 0.8px;
+      text-transform: uppercase;
+    }
+
+    textarea,
+    input {
+      width: 100%;
+      border: 1px solid #34452b;
+      border-radius: 12px;
+      outline: none;
+      color: white;
+      background: #070a07;
+      transition: 0.2s;
+    }
+
+    textarea {
+      min-height: 210px;
+      padding: 14px;
+      resize: vertical;
+      line-height: 1.6;
+    }
+
+    input {
+      padding: 13px 14px;
+    }
+
+    textarea:focus,
+    input:focus {
+      border-color: var(--green);
+      box-shadow: 0 0 0 3px rgba(173, 255, 0, 0.12);
+    }
+
+    .start-button {
+      width: 100%;
+      margin-top: 20px;
+      padding: 16px;
+      border: 0;
+      border-radius: 12px;
+      cursor: pointer;
+      color: #071000;
+      background: linear-gradient(135deg, var(--yellow), var(--green));
+      font-weight: 1000;
+      font-size: 17px;
+      text-transform: uppercase;
+      box-shadow: 0 0 25px rgba(173, 255, 0, 0.3);
+      transition: transform 0.2s, filter 0.2s;
+    }
+
+    .start-button:hover {
+      transform: translateY(-2px);
+      filter: brightness(1.1);
+    }
+
+    .start-button:disabled {
+      cursor: not-allowed;
+      opacity: 0.45;
+      transform: none;
+    }
+
+    .warning {
+      margin-top: 14px;
+      color: #849080;
+      font-size: 12px;
+      line-height: 1.45;
+      text-align: center;
+    }
+
+    .race-panel {
+      min-height: 520px;
+    }
+
+    .race-header {
+      display: flex;
+      justify-content: space-between;
+      gap: 15px;
+      align-items: center;
+      margin-bottom: 22px;
+    }
+
+    .status {
+      padding: 9px 15px;
+      border: 1px solid #35511c;
+      border-radius: 999px;
+      color: var(--green);
+      background: #0b1207;
+      font-size: 13px;
+      font-weight: 900;
+      text-transform: uppercase;
+    }
+
+    .track {
+      position: relative;
+      min-height: 400px;
+      overflow: hidden;
+      border: 1px solid #30382c;
+      border-radius: 18px;
+      padding: 16px 64px 16px 15px;
+      background:
+        linear-gradient(90deg, rgba(173, 255, 0, 0.025), transparent),
+        repeating-linear-gradient(
+          0deg,
+          #111611 0,
+          #111611 58px,
+          #252c23 59px,
+          #252c23 61px
+        );
+    }
+
+    .finish-line {
+      position: absolute;
+      z-index: 1;
+      top: 0;
+      right: 40px;
+      width: 24px;
+      height: 100%;
+      opacity: 0.8;
+      background:
+        conic-gradient(
+          #fff 25%,
+          #111 0 50%,
+          #fff 0 75%,
+          #111 0
+        ) 0 0 / 24px 24px;
+      box-shadow: 0 0 18px rgba(255, 255, 255, 0.28);
+    }
+
+    .finish-label {
+      position: absolute;
+      z-index: 2;
+      top: 10px;
+      right: 12px;
+      color: var(--yellow);
+      font-size: 11px;
+      font-weight: 1000;
+      writing-mode: vertical-rl;
+      text-transform: uppercase;
+    }
+
+    .lane {
+      position: relative;
+      height: 61px;
+    }
+
+    .racer {
+      position: absolute;
+      z-index: 3;
+      top: 8px;
+      left: 0;
+      width: 150px;
+      height: 45px;
+      display: flex;
+      align-items: center;
+      gap: 9px;
+      padding: 5px 9px;
+      border: 1px solid #4d652b;
+      border-radius: 12px;
+      background: linear-gradient(135deg, #1f2d12, #080b07);
+      box-shadow: 0 7px 15px rgba(0, 0, 0, 0.45);
+      transform: translateX(0);
+      will-change: transform;
+    }
+
+    .racer-icon {
+      position: relative;
+      width: 38px;
+      height: 31px;
+      flex-shrink: 0;
+      border: 2px solid var(--green);
+      border-radius: 7px;
+      background: #090b09;
+      box-shadow: 0 0 9px rgba(173, 255, 0, 0.25);
+    }
+
+    .racer-icon::before,
+    .racer-icon::after {
+      content: "";
+      position: absolute;
+      bottom: -7px;
+      width: 10px;
+      height: 10px;
+      border: 2px solid #566247;
+      border-radius: 50%;
+      background: #050505;
+    }
+
+    .racer-icon::before {
+      left: 3px;
+    }
+
+    .racer-icon::after {
+      right: 3px;
+    }
+
+    .solana-mark {
+      position: absolute;
+      inset: 0;
+      display: grid;
+      place-items: center;
+      color: var(--green);
+      font-size: 16px;
+      font-weight: 1000;
+    }
+
+    .wallet-name {
+      min-width: 0;
+    }
+
+    .wallet-name strong {
+      display: block;
+      overflow: hidden;
+      color: white;
+      font-size: 12px;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+
+    .wallet-name small {
+      color: var(--green);
+      font-size: 10px;
+      font-weight: 800;
+    }
+
+    .speed-lines {
+      position: absolute;
+      left: -26px;
+      width: 20px;
+      height: 2px;
+      opacity: 0;
+      background: var(--yellow);
+      box-shadow:
+        5px 8px 0 var(--green),
+        0 16px 0 var(--yellow);
+    }
+
+    .racing .speed-lines {
+      opacity: 0.75;
+    }
+
+    .empty-state {
+      min-height: 390px;
+      display: grid;
+      place-items: center;
+      padding: 30px;
+      text-align: center;
+      color: #899386;
+    }
+
+    .empty-state span {
+      display: block;
+      margin-bottom: 12px;
+      font-size: 70px;
+    }
+
+    .winner-modal {
+      position: fixed;
+      z-index: 50;
+      inset: 0;
+      display: none;
+      align-items: center;
+      justify-content: center;
+      padding: 20px;
+      background: rgba(0, 0, 0, 0.83);
+      backdrop-filter: blur(10px);
+    }
+
+    .winner-modal.show {
+      display: flex;
+      animation: fadeIn 0.3s ease;
+    }
+
+    .winner-card {
+      width: min(540px, 100%);
+      padding: 35px 25px;
+      border: 2px solid var(--green);
+      border-radius: 28px;
+      text-align: center;
+      background:
+        radial-gradient(circle at top, #263d0e, #070a06 62%);
+      box-shadow:
+        0 0 60px rgba(173, 255, 0, 0.35),
+        inset 0 0 35px rgba(173, 255, 0, 0.08);
+      animation: winnerPop 0.55s ease;
+    }
+
+    .trophy {
+      display: inline-block;
+      font-size: 100px;
+      filter: drop-shadow(0 0 25px rgba(255, 245, 0, 0.65));
+      animation: trophyBounce 1s infinite alternate ease-in-out;
+    }
+
+    .winner-card h2 {
+      margin: 14px 0 8px;
+      color: var(--yellow);
+      font-size: clamp(30px, 7vw, 54px);
+      font-weight: 1000;
+      text-transform: uppercase;
+    }
+
+    .winner-card p {
+      color: #b5c1b0;
+    }
+
+    .winner-wallet {
+      margin: 22px 0 12px;
+      padding: 16px;
+      overflow-wrap: anywhere;
+      border: 1px solid #4a642c;
+      border-radius: 14px;
+      color: white;
+      background: rgba(0, 0, 0, 0.5);
+      font-family: monospace;
+      font-size: 15px;
+    }
+
+    .prize-text {
+      margin-bottom: 22px;
+      color: var(--green);
+      font-size: 24px;
+      font-weight: 1000;
+    }
+
+    .close-button {
+      padding: 13px 30px;
+      border: 0;
+      border-radius: 12px;
+      cursor: pointer;
+      color: #081000;
+      background: linear-gradient(135deg, var(--yellow), var(--green));
+      font-weight: 1000;
+    }
+
+    #confettiCanvas {
+      position: fixed;
+      z-index: 49;
+      inset: 0;
+      width: 100%;
+      height: 100%;
+      pointer-events: none;
+    }
+
+    footer {
+      padding: 25px;
+      border-top: 1px solid #23301c;
+      color: #768070;
+      text-align: center;
+      font-size: 13px;
+    }
+
+    footer strong {
+      color: var(--green);
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; }
+      to { opacity: 1; }
+    }
+
+    @keyframes winnerPop {
+      from {
+        opacity: 0;
+        transform: scale(0.65) rotate(-3deg);
+      }
+      to {
+        opacity: 1;
+        transform: scale(1) rotate(0);
+      }
+    }
+
+    @keyframes trophyBounce {
+      from { transform: translateY(0) rotate(-4deg); }
+      to { transform: translateY(-12px) rotate(4deg); }
+    }
+
+    @media (max-width: 850px) {
+      .dashboard {
+        grid-template-columns: 1fr;
+      }
+
+      .hero {
+        min-height: 270px;
+      }
+
+      .navbar {
+        padding: 14px 4%;
+      }
+
+      .brand {
+        font-size: 17px;
+      }
+
+      .brand-logo {
+        width: 44px;
+        height: 44px;
+      }
+
+      .nav-badge {
+        display: none;
+      }
+
+      .track {
+        padding-right: 48px;
+      }
+
+      .finish-line {
+        right: 27px;
+      }
+
+      .finish-label {
+        right: 4px;
+      }
+
+      .racer {
+        width: 128px;
+      }
+    }
+  </style>
+</head>
+
+<body>
+
+  <canvas id="confettiCanvas"></canvas>
+
+  <header class="hero">
+    <nav class="navbar">
+      <div class="brand">
+        <img
+          src="logo.png"
+          alt="Wallet Racers logo"
+          class="brand-logo"
+          onerror="this.style.display='none'"
+        >
+        Wallet Racers
+      </div>
+
+      <div class="nav-badge">Built on Solana</div>
+    </nav>
+
+    <div class="hero-content">
+      <h1>Wallet <span>Racers</span></h1>
+      <p>Every wallet deserves a race.</p>
+    </div>
+  </header>
+
+  <main class="container">
+    <section class="dashboard">
+
+      <aside class="panel">
+        <h2>Race setup</h2>
+
+        <p class="panel-description">
+          Add one wallet per line. A maximum of 10 wallets can participate.
+        </p>
+
+        <label for="wallets">Wallet addresses</label>
+
+        <textarea id="wallets">7xKXtg2CW87d97TXJSDpbD5jBkheTqA83TZRuJosg1F
+9mYaLhZd9YVZr1fVVLmJuJn8KPkYhTwMNFvLGx7zS2p
+B2PHQ3hYfU1sJ3Y1tBVd3R6nh8nXLQfJas6wZkJQH8N
+D7zC8wnYaxKpuUGdUwhBjpjbT2zu1vEc1dPF8GJvX5T
+Fo83Nq7oXLhczWRJrWQ2Cq6KAK2nVL65TCKfJxQUG8g</textarea>
+
+        <label for="prize">Demo prize in SOL</label>
+
+        <input
+          id="prize"
+          type="number"
+          min="0"
+          step="0.01"
+          value="1"
+        >
+
+        <button id="startButton" class="start-button">
+          Start Race
+        </button>
+
+        <p class="warning">
+          Demo mode only. This version does not transfer real SOL and does not
+          request private keys.
+        </p>
+      </aside>
+
+      <section class="panel race-panel">
+        <div class="race-header">
+          <div>
+            <h2>Live race</h2>
+            <p class="panel-description" style="margin: 5px 0 0;">
+              First wallet to cross the finish line wins.
+            </p>
+          </div>
+
+          <div id="status" class="status">Waiting</div>
+        </div>
+
+        <div id="track" class="track">
+          <div class="finish-line"></div>
+          <div class="finish-label">Finish</div>
+
+          <div class="empty-state">
+            <div>
+              <span>🏁</span>
+              Enter the wallets and press <strong>Start Race</strong>.
+            </div>
+          </div>
+        </div>
+      </section>
+
+    </section>
+  </main>
+
+  <div id="winnerModal" class="winner-modal">
+    <div class="winner-card">
+      <div class="trophy">🏆</div>
+
+      <h2>Winner!</h2>
+
+      <p>The fastest wallet is:</p>
+
+      <div id="winnerWallet" class="winner-wallet"></div>
+
+      <div id="prizeText" class="prize-text"></div>
+
+      <button id="closeButton" class="close-button">
+        Race Again
+      </button>
+    </div>
+  </div>
+
+  <footer>
+    <strong>Wallet Racers</strong> · Buy. Race. HODL. Win.
+  </footer>
+
+  <script>
+    const walletsInput = document.getElementById("wallets");
+    const prizeInput = document.getElementById("prize");
+    const startButton = document.getElementById("startButton");
+    const track = document.getElementById("track");
+    const statusElement = document.getElementById("status");
+    const winnerModal = document.getElementById("winnerModal");
+    const winnerWallet = document.getElementById("winnerWallet");
+    const prizeText = document.getElementById("prizeText");
+    const closeButton = document.getElementById("closeButton");
+
+    let raceRunning = false;
+
+    function shortWallet(wallet) {
+      if (wallet.length <= 13) return wallet;
+      return wallet.slice(0, 6) + "..." + wallet.slice(-5);
+    }
+
+    function getWallets() {
+      return walletsInput.value
+        .split("\n")
+        .map(wallet => wallet.trim())
+        .filter(Boolean)
+        .slice(0, 10);
+    }
+
+    function secureRandomIndex(max) {
+      if (max <= 0) return 0;
+
+      const randomArray = new Uint32Array(1);
+      const maximumValidNumber =
+        Math.floor(0x100000000 / max) * max;
+
+      let randomNumber;
+
+      do {
+        crypto.getRandomValues(randomArray);
+        randomNumber = randomArray[0];
+      } while (randomNumber >= maximumValidNumber);
+
+      return randomNumber % max;
+    }
+
+    function randomBetween(min, max) {
+      const randomArray = new Uint32Array(1);
+      crypto.getRandomValues(randomArray);
+
+      return min + (randomArray[0] / 0xffffffff) * (max - min);
+    }
+
+    function createRacers(wallets) {
+      track.innerHTML = `
+        <div class="finish-line"></div>
+        <div class="finish-label">Finish</div>
+      `;
+
+      wallets.forEach((wallet, index) => {
+        const lane = document.createElement("div");
+        lane.className = "lane";
+
+        lane.innerHTML = `
+          <div class="racer" data-index="${index}">
+            <div class="speed-lines"></div>
+
+            <div class="racer-icon">
+              <div class="solana-mark">S</div>
+            </div>
+
+            <div class="wallet-name">
+              <strong>${shortWallet(wallet)}</strong>
+              <small>RACER ${String(index + 1).padStart(2, "0")}</small>
+            </div>
+          </div>
+        `;
+
+        track.appendChild(lane);
+      });
+    }
+
+    function easeOutCubic(value) {
+      return 1 - Math.pow(1 - value, 3);
+    }
+
+    function startRace() {
+      if (raceRunning) return;
+
+      const wallets = getWallets();
+
+      if (wallets.length < 2) {
+        alert("Add at least 2 wallet addresses.");
+        return;
+      }
+
+      const prize = Number(prizeInput.value);
+
+      if (!Number.isFinite(prize) || prize < 0) {
+        alert("Enter a valid prize amount.");
+        return;
+      }
+
+      raceRunning = true;
+      startButton.disabled = true;
+      walletsInput.disabled = true;
+      prizeInput.disabled = true;
+
+      createRacers(wallets);
+
+      const racers = [...document.querySelectorAll(".racer")];
+      const winnerIndex = secureRandomIndex(wallets.length);
+
+      const finalPositions = racers.map((_, index) => {
+        return index === winnerIndex
+          ? 100
+          : randomBetween(72, 94);
+      });
+
+      statusElement.textContent = "Get Ready";
+
+      let countdown = 3;
+
+      const countdownTimer = setInterval(() => {
+        if (countdown > 0) {
+          statusElement.textContent = countdown;
+          countdown--;
+          return;
+        }
+
+        clearInterval(countdownTimer);
+        statusElement.textContent = "Racing";
+        racers.forEach(racer => racer.classList.add("racing"));
+
+        animateRace(
+          racers,
+          wallets,
+          winnerIndex,
+          finalPositions,
+          prize
+        );
+      }, 700);
+    }
+
+    function animateRace(
+      racers,
+      wallets,
+      winnerIndex,
+      finalPositions,
+      prize
+    ) {
+      const raceDuration = 8500;
+      const startTime = performance.now();
+
+      function frame(currentTime) {
+        const elapsed = currentTime - startTime;
+        const progress = Math.min(elapsed / raceDuration, 1);
+        const easedProgress = easeOutCubic(progress);
+
+        racers.forEach((racer, index) => {
+          const trackWidth =
+            track.clientWidth -
+            racer.offsetWidth -
+            70;
+
+          const wave =
+            Math.sin(progress * 18 + index * 1.7) *
+            (1 - progress) *
+            5;
+
+          let percentage =
+            easedProgress * finalPositions[index] + wave;
+
+          percentage = Math.max(0, percentage);
+
+          if (index !== winnerIndex) {
+            percentage = Math.min(
+              percentage,
+              finalPositions[index]
+            );
+          }
+
+          if (progress === 1 && index === winnerIndex) {
+            percentage = 100;
+          }
+
+          const position =
+            (percentage / 100) * Math.max(trackWidth, 20);
+
+          racer.style.transform =
+            `translateX(${position}px)`;
+        });
+
+        if (progress < 1) {
+          requestAnimationFrame(frame);
+        } else {
+          finishRace(wallets[winnerIndex], prize, racers);
+        }
+      }
+
+      requestAnimationFrame(frame);
+    }
+
+    function finishRace(wallet, prize, racers) {
+      racers.forEach(racer => racer.classList.remove("racing"));
+
+      statusElement.textContent = "Finished";
+
+      winnerWallet.textContent = wallet;
+      prizeText.textContent = `Demo prize: ${prize} SOL`;
+
+      setTimeout(() => {
+        winnerModal.classList.add("show");
+        launchConfetti();
+      }, 600);
+    }
+
+    function resetRace() {
+      winnerModal.classList.remove("show");
+      stopConfetti();
+
+      raceRunning = false;
+      startButton.disabled = false;
+      walletsInput.disabled = false;
+      prizeInput.disabled = false;
+      statusElement.textContent = "Waiting";
+
+      track.innerHTML = `
+        <div class="finish-line"></div>
+        <div class="finish-label">Finish</div>
+
+        <div class="empty-state">
+          <div>
+            <span>🏁</span>
+            Enter the wallets and press
+            <strong>Start Race</strong>.
+          </div>
+        </div>
+      `;
+    }
+
+    startButton.addEventListener("click", startRace);
+    closeButton.addEventListener("click", resetRace);
+
+    const canvas = document.getElementById("confettiCanvas");
+    const context = canvas.getContext("2d");
+
+    let particles = [];
+    let confettiAnimation = null;
+
+    function resizeCanvas() {
+      canvas.width = window.innerWidth;
+      canvas.height = window.innerHeight;
+    }
+
+    window.addEventListener("resize", resizeCanvas);
+    resizeCanvas();
+
+    function launchConfetti() {
+      const colors = [
+        "#adff00",
+        "#fff500",
+        "#14f195",
+        "#9945ff",
+        "#ffffff"
+      ];
+
+      particles = Array.from({ length: 240 }, () => ({
+        x: Math.random() * canvas.width,
+        y: Math.random() * -canvas.height,
+        width: randomBetween(5, 12),
+        height: randomBetween(8, 18),
+        speedY: randomBetween(2.5, 7),
+        speedX: randomBetween(-2.5, 2.5),
+        rotation: Math.random() * Math.PI,
+        rotationSpeed: randomBetween(-0.15, 0.15),
+        color: colors[secureRandomIndex(colors.length)]
+      }));
+
+      animateConfetti();
+    }
+
+    function animateConfetti() {
+      context.clearRect(0, 0, canvas.width, canvas.height);
+
+      particles.forEach(particle => {
+        particle.x += particle.speedX;
+        particle.y += particle.speedY;
+        particle.rotation += particle.rotationSpeed;
+
+        if (particle.y > canvas.height + 20) {
+          particle.y = -20;
+          particle.x = Math.random() * canvas.width;
+        }
+
+        context.save();
+        context.translate(particle.x, particle.y);
+        context.rotate(particle.rotation);
+        context.fillStyle = particle.color;
+
+        context.fillRect(
+          -particle.width / 2,
+          -particle.height / 2,
+          particle.width,
+          particle.height
+        );
+
+        context.restore();
+      });
+
+      confettiAnimation =
+        requestAnimationFrame(animateConfetti);
+    }
+
+    function stopConfetti() {
+      cancelAnimationFrame(confettiAnimation);
+      context.clearRect(0, 0, canvas.width, canvas.height);
+      particles = [];
+    }
+  </script>
+
+</body>
+</html>
