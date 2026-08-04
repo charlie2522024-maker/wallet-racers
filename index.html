@@ -3009,6 +3009,7 @@ const PARTICIPANTS_API = "https://wallet-racers-api.charlie2522024.workers.dev/p
       soundButton.disabled =
         false;
 autoStartScheduled = false;
+      waitingStartedAt = null;
       voiceButton.disabled =
         false;
 
@@ -3126,6 +3127,7 @@ autoStartScheduled = false;
 
     let verifiedWallets = [];
 let autoStartScheduled = false;
+    let waitingStartedAt = null;
 async function syncParticipants() {
   try {
     const response = await fetch(PARTICIPANTS_API, {
@@ -3149,26 +3151,66 @@ async function syncParticipants() {
     const walletsForRace =
       verifiedWallets.slice(0, MAX_WALLETS);
 
-    if (!startButton.disabled) {
+   if (!startButton.disabled) {
   walletsInput.value =
     walletsForRace.join("\n");
 
   updateParticipants();
 
   if (
-    walletsForRace.length === MAX_WALLETS &&
+    walletsForRace.length > 0 &&
+    waitingStartedAt === null
+  ) {
+    waitingStartedAt = Date.now();
+  }
+
+  const waitExpired =
+    waitingStartedAt !== null &&
+    Date.now() - waitingStartedAt >= 60000;
+
+  const enoughBuyersAfterWait =
+    waitExpired && walletsForRace.length > 1;
+
+  const raceIsFull =
+    walletsForRace.length === MAX_WALLETS;
+
+  if (
+    (raceIsFull || enoughBuyersAfterWait) &&
     !autoStartScheduled
   ) {
     autoStartScheduled = true;
 
     statusElement.textContent =
-      "10 buyers ready. Race starts in 5 seconds...";
+      raceIsFull
+        ? "10 buyers ready. Race starts in 5 seconds..."
+        : "1 minute completed. Race starts in 5 seconds...";
 
     setTimeout(() => {
       if (!startButton.disabled) {
         startRace();
       }
     }, 5000);
+  } else if (
+    walletsForRace.length === 1 &&
+    waitExpired
+  ) {
+    statusElement.textContent =
+      "Waiting for at least 2 buyers...";
+  } else if (
+    walletsForRace.length > 0 &&
+    !autoStartScheduled
+  ) {
+    const secondsLeft = Math.max(
+      0,
+      60 -
+        Math.floor(
+          (Date.now() - waitingStartedAt) / 1000
+        )
+    );
+
+    statusElement.textContent =
+      `${walletsForRace.length}/10 buyers. ` +
+      `Race starts in ${secondsLeft}s or when 10 join.`;
   }
 }
     console.log(
