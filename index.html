@@ -2979,6 +2979,16 @@ const PARTICIPANTS_API = "https://wallet-racers-api.charlie2522024.workers.dev/p
     }
 
     function resetRace() {
+      if (currentRaceWallets.length > 0) {
+  raceOffset += currentRaceWallets.length;
+
+  localStorage.setItem(
+    "raceOffset",
+    String(raceOffset)
+  );
+
+  currentRaceWallets = [];
+}
       winnerModal.classList.remove(
         "show"
       );
@@ -3128,6 +3138,10 @@ autoStartScheduled = false;
     let verifiedWallets = [];
 let autoStartScheduled = false;
     let waitingStartedAt = null;
+    let raceOffset =
+  Number(localStorage.getItem("raceOffset") || 0);
+
+let currentRaceWallets = [];
 async function syncParticipants() {
   try {
     const response = await fetch(PARTICIPANTS_API, {
@@ -3148,9 +3162,18 @@ async function syncParticipants() {
       )
     ];
 
-    const walletsForRace =
-      verifiedWallets.slice(0, MAX_WALLETS);
+    if (raceOffset >= verifiedWallets.length) {
+  raceOffset = 0;
+  localStorage.setItem("raceOffset", "0");
+}
 
+const walletsForRace =
+  verifiedWallets.slice(
+    raceOffset,
+    raceOffset + MAX_WALLETS
+  );
+
+currentRaceWallets = walletsForRace;
    if (!startButton.disabled) {
   walletsInput.value =
     walletsForRace.join("\n");
