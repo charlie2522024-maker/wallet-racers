@@ -1444,7 +1444,7 @@ Fo83Nq7oXLhczWRJrWQ2Cq6KAK2nVL65TCKfJxQUG8g</textarea>
    const CONTRACT_ADDRESS = "DQoZ5kkRnuUqHuQxY9exTHK4zpwgjYkaEc3uuADBpump";
 
 const BUY_LINK = "https://pump.fun/coin/DQoZ5kkRnuUqHuQxY9exTHK4zpwgjYkaEc3uuADBpump";
-
+const PARTICIPANTS_API = "https://wallet-racers-api.charlie2522024.workers.dev/participants";
     const RACE_DURATION = 40000;
     const MAX_WALLETS = 10;
 
@@ -3126,6 +3126,48 @@ const BUY_LINK = "https://pump.fun/coin/DQoZ5kkRnuUqHuQxY9exTHK4zpwgjYkaEc3uuADB
       updateParticipants
     );
 
+    let verifiedWallets = [];
+
+async function syncParticipants() {
+  try {
+    const response = await fetch(PARTICIPANTS_API, {
+      cache: "no-store"
+    });
+
+    if (!response.ok) {
+      throw new Error(`HTTP ${response.status}`);
+    }
+
+    const data = await response.json();
+
+    verifiedWallets = [
+      ...new Set(
+        (data.participants || [])
+          .map((participant) => participant.wallet)
+          .filter(Boolean)
+      )
+    ];
+
+    const walletsForRace =
+      verifiedWallets.slice(0, MAX_WALLETS);
+
+    if (!startButton.disabled) {
+      walletsInput.value =
+        walletsForRace.join("\n");
+
+      updateParticipants();
+    }
+
+    console.log(
+      `${verifiedWallets.length} verified buyers loaded`
+    );
+  } catch (error) {
+    console.error(
+      "Could not load verified buyers:",
+      error
+    );
+  }
+}
     startButton.addEventListener(
       "click",
       startRace
@@ -3137,6 +3179,13 @@ const BUY_LINK = "https://pump.fun/coin/DQoZ5kkRnuUqHuQxY9exTHK4zpwgjYkaEc3uuADB
     );
 
     updateParticipants();
+    syncParticipants();
+
+setInterval(() => {
+  if (!document.hidden) {
+    syncParticipants();
+  }
+}, 30000);
 
     const canvas =
       document.getElementById(
