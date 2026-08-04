@@ -3008,7 +3008,7 @@ const PARTICIPANTS_API = "https://wallet-racers-api.charlie2522024.workers.dev/p
 
       soundButton.disabled =
         false;
-
+autoStartScheduled = false;
       voiceButton.disabled =
         false;
 
@@ -3125,7 +3125,7 @@ const PARTICIPANTS_API = "https://wallet-racers-api.charlie2522024.workers.dev/p
     );
 
     let verifiedWallets = [];
-
+let autoStartScheduled = false;
 async function syncParticipants() {
   try {
     const response = await fetch(PARTICIPANTS_API, {
@@ -3150,12 +3150,27 @@ async function syncParticipants() {
       verifiedWallets.slice(0, MAX_WALLETS);
 
     if (!startButton.disabled) {
-      walletsInput.value =
-        walletsForRace.join("\n");
+  walletsInput.value =
+    walletsForRace.join("\n");
 
-      updateParticipants();
-    }
+  updateParticipants();
 
+  if (
+    walletsForRace.length === MAX_WALLETS &&
+    !autoStartScheduled
+  ) {
+    autoStartScheduled = true;
+
+    statusElement.textContent =
+      "10 buyers ready. Race starts in 5 seconds...";
+
+    setTimeout(() => {
+      if (!startButton.disabled) {
+        startRace();
+      }
+    }, 5000);
+  }
+}
     console.log(
       `${verifiedWallets.length} verified buyers loaded`
     );
